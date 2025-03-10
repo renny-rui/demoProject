@@ -1,0 +1,17 @@
+
+  /* 修改 Input 组件的背景颜色 */
+  .el-input__inner {
+    background-color: #D8D8D8 !important;
+    opacity: 0.8;
+    color: black !important;
+    border:2px solid #ffffff
+  }
+  .el-input__inner::placeholder {
+    color: #F3F3F3 !important;
+    opacity: 1;
+  }
+  .el-card {
+    background-color: #ffffff;
+    /* color: #FFF; */
+    cursor: pointer;
+}
