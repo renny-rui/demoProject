@@ -15,19 +15,21 @@
         <span v-if="!isCollapse" class="title">智能评估系统</span>
       </div>
 
-      <!-- User Management -->
+      <!-- 用户管理 -->
       <el-submenu index="/user">
         <template slot="title">
           <i class="el-icon-user"></i>
           <span>人员管理</span>
         </template>
+        <!-- 人员信息 - 所有用户可见 -->
         <el-menu-item index="/user/info">人员信息</el-menu-item>
-        <el-menu-item index="/user/organization">组织架构</el-menu-item>
-        <el-menu-item index="/user/roles">权限管理</el-menu-item>
-        <el-menu-item index="/user/logs">操作日志</el-menu-item>
+        <!-- 以下菜单项仅管理员可见 -->
+        <el-menu-item v-if="isAdmin" index="/user/organization">组织架构</el-menu-item>
+        <el-menu-item v-if="isAdmin" index="/user/roles">权限管理</el-menu-item>
+        <el-menu-item v-if="isAdmin" index="/user/logs">操作日志</el-menu-item>
       </el-submenu>
 
-      <!-- Device Management -->
+      <!-- 设备管理 -->
       <el-submenu index="/device">
         <template slot="title">
           <i class="el-icon-monitor"></i>
@@ -36,7 +38,23 @@
         <el-menu-item index="/device/info">设备信息</el-menu-item>
       </el-submenu>
 
-      <!-- Course Management -->
+      <!-- 任务分配 -->
+      <el-submenu index="/tasks">
+        <template slot="title">
+          <i class="el-icon-s-order"></i>
+          <span>任务分配</span>
+        </template>
+        <el-menu-item index="/tasks/device-binding">设备/人员绑定</el-menu-item>
+        <el-menu-item index="/tasks/task-assignment">任务分配</el-menu-item>
+      </el-submenu>
+
+      <!-- 作战态势分析 -->
+      <el-menu-item index="/battle-simulation">
+        <i class="el-icon-map-location"></i>
+        <span>作战态势分析</span>
+      </el-menu-item>
+
+      <!-- 课程管理 -->
       <el-submenu index="/course">
         <template slot="title">
           <i class="el-icon-reading"></i>
@@ -47,7 +65,7 @@
         <el-menu-item index="/course/publish">发布记录</el-menu-item>
       </el-submenu>
 
-      <!-- Score Management -->
+      <!-- 成绩管理 -->
       <el-submenu index="/score">
         <template slot="title">
           <i class="el-icon-data-analysis"></i>
@@ -56,7 +74,7 @@
         <el-menu-item index="/score/statistics">成绩统计</el-menu-item>
       </el-submenu>
 
-      <!-- Teaching Content Management -->
+      <!-- 示教内容管理 -->
       <el-submenu index="/teaching">
         <template slot="title">
           <i class="el-icon-notebook-1"></i>
@@ -76,12 +94,58 @@ export default {
   data() {
     return {
       isCollapse: false,
-      activeIndex: this.$route.path
+      activeIndex: this.$route.path,
+      userInfo: null
+    }
+  },
+  computed: {
+    // 判断当前用户是否为管理员
+    isAdmin() {
+      console.log('isAdmin计算属性被调用，当前用户信息:', this.userInfo);
+      // 使用==而不是===，允许类型转换
+      return this.userInfo && this.userInfo.role == 0;
+    }
+  },
+  created() {
+    // 获取用户信息
+    this.getUserInfo();
+    
+    // 监听用户信息变化
+    window.addEventListener('storage', this.handleStorageChange);
+  },
+  beforeDestroy() {
+    // 移除事件监听
+    window.removeEventListener('storage', this.handleStorageChange);
+  },
+  methods: {
+    // 获取用户信息
+    getUserInfo() {
+      const userInfoStr = localStorage.getItem('userInfo');
+      
+      console.log('侧边栏从localStorage获取的原始字符串:', userInfoStr);
+      
+      if (userInfoStr) {
+        try {
+          this.userInfo = JSON.parse(userInfoStr);
+          console.log('当前用户角色:', this.userInfo.role);
+        } catch (error) {
+          console.error('解析用户信息失败:', error);
+          this.userInfo = null;
+        }
+      } else {
+        console.log('localStorage中没有找到userInfo');
+      }
+    },
+    // 处理本地存储变化
+    handleStorageChange(e) {
+      if (e.key === 'userInfo') {
+        this.getUserInfo();
+      }
     }
   },
   watch: {
     $route(route) {
-      this.activeIndex = route.path
+      this.activeIndex = route.path;
     }
   }
 }
@@ -89,7 +153,8 @@ export default {
 
 <style scoped>
 .sidebar {
-  height: 100%;
+  display: flex;
+  min-height: 100vh;
   background-color: #304156;
 }
 

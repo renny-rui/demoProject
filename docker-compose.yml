@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    networks:
+      - app-network
+    depends_on:
+      - backend
+
+  backend:
+    # 替换为您的后端服务镜像
+    image: your-backend-image:latest
+    # 或者使用build构建后端
+    # build:
+    #   context: ../backend
+    #   dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    networks:
+      - app-network
+    # 如果需要环境变量
+    # environment:
+    #   - DATABASE_URL=...
+    #   - OTHER_ENV_VAR=...
+
+networks:
+  app-network:
+    driver: bridge

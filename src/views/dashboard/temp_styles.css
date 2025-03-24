@@ -1,0 +1,501 @@
+/* 全局容器样式 */
+.battle-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background-color: #000;
+  color: #fff;
+  overflow: hidden;
+  font-family: 'Orbitron', sans-serif;
+}
+
+/* 顶部标题栏样式 */
+.top-header-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 10;
+}
+
+.top-header {
+  background-color: rgba(0, 0, 0, 0.7);
+  border-bottom: 1px solid #00CCFF;
+  padding: 10px 0;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.header-left, .header-right {
+  color: #00CCFF;
+  font-size: 16px;
+}
+
+.header-center {
+  color: #FFFFFF;
+  font-size: 20px;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+/* 视频容器样式 */
+.video-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #000;
+}
+
+.battle-video {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+}
+
+.iframe-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.video-iframe {
+  width: 100%;
+  height: 100%;
+}
+
+/* 四角装饰 */
+.frame-corners {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.corner {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border: 2px solid #00CCFF;
+}
+
+.top-left {
+  top: 20px;
+  left: 20px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.top-right {
+  top: 20px;
+  right: 20px;
+  border-left: none;
+  border-bottom: none;
+}
+
+.bottom-left {
+  bottom: 20px;
+  left: 20px;
+  border-right: none;
+  border-top: none;
+}
+
+.bottom-right {
+  bottom: 20px;
+  right: 20px;
+  border-left: none;
+  border-top: none;
+}
+
+/* 战场信息展示区域样式 */
+.battlefield-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 20% 60% 20%;
+  grid-template-rows: 1fr 150px;
+  grid-template-areas:
+    "left center right"
+    "bottom bottom bottom";
+  gap: 10px;
+  padding: 60px 10px 10px;
+  background-color: #000;
+  overflow: hidden;
+}
+
+/* 左侧面板样式 */
+.left-panel {
+  grid-area: left;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* 中央面板样式 */
+.center-panel {
+  grid-area: center;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* 右侧面板样式 */
+.right-panel {
+  grid-area: right;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* 底部面板样式 */
+.bottom-panel {
+  grid-area: bottom;
+  display: flex;
+  gap: 10px;
+  padding: 5px 0;
+}
+
+/* 信息卡片通用样式 */
+.info-card {
+  background-color: rgba(0, 51, 102, 0.5);
+  border: 1px solid #00CCFF;
+  border-radius: 5px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 150px;
+  box-shadow: 0 0 10px rgba(0, 204, 255, 0.3);
+}
+
+.card-title {
+  color: #00CCFF;
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  border-bottom: 1px solid #00CCFF;
+  padding-bottom: 5px;
+}
+
+/* 底部卡片样式 */
+.bottom-card {
+  background-color: rgba(0, 51, 102, 0.5);
+  border: 1px solid #00CCFF;
+  border-radius: 5px;
+  padding: 10px;
+  min-width: 200px;
+  flex: 1;
+  box-shadow: 0 0 10px rgba(0, 204, 255, 0.3);
+}
+
+/* 图表容器样式 */
+.chart-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 3D容器样式 */
+.battle-view {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background-color: rgba(0, 51, 102, 0.3);
+  border: 1px solid #00CCFF;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.three-container {
+  width: 100%;
+  height: 100%;
+}
+
+/* 统计条样式 */
+.stats-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stat-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.stat-label {
+  width: 60px;
+  font-size: 12px;
+  color: #FFFFFF;
+}
+
+.stat-bar {
+  flex: 1;
+  height: 8px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.stat-bar-fill {
+  height: 100%;
+  background-color: #00CCFF;
+  border-radius: 4px;
+}
+
+.stat-value {
+  width: 30px;
+  font-size: 12px;
+  color: #00CCFF;
+  text-align: right;
+}
+
+/* 战场信息样式 */
+.info-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.info-label {
+  font-size: 12px;
+  color: #FFFFFF;
+}
+
+.info-value {
+  font-size: 12px;
+  color: #00CCFF;
+}
+
+/* 装备信息样式 */
+.equipment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.equipment-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.equipment-icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #00CCFF;
+}
+
+.equipment-name {
+  font-size: 12px;
+  color: #FFFFFF;
+}
+
+/* 统计圆圈样式 */
+.stat-circle-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.stat-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid #00CCFF;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 0 15px rgba(0, 204, 255, 0.5);
+}
+
+.stat-circle .stat-value {
+  font-size: 20px;
+  color: #00CCFF;
+  width: auto;
+}
+
+/* 战场数据样式 */
+.data-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.data-value {
+  font-size: 36px;
+  color: #00CCFF;
+  font-weight: bold;
+}
+
+.data-subtitle {
+  font-size: 12px;
+  color: #FFFFFF;
+}
+
+/* LOGO样式 */
+.logo-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.game-logo {
+  font-size: 24px;
+  color: #00CCFF;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+.game-subtitle {
+  font-size: 14px;
+  color: #FFFFFF;
+  letter-spacing: 1px;
+}
+
+/* 帮助按钮样式 */
+.help-btn {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  background-color: rgba(0, 51, 102, 0.7);
+  border: 1px solid #00CCFF;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #00CCFF;
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 100;
+  box-shadow: 0 0 10px rgba(0, 204, 255, 0.5);
+}
+
+.help-btn:hover {
+  background-color: rgba(0, 102, 153, 0.7);
+}
+
+/* 帮助面板样式 */
+.help-panel {
+  position: absolute;
+  bottom: 70px;
+  right: 20px;
+  width: 300px;
+  background-color: rgba(0, 51, 102, 0.9);
+  border: 1px solid #00CCFF;
+  border-radius: 5px;
+  z-index: 100;
+  box-shadow: 0 0 15px rgba(0, 204, 255, 0.5);
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #00CCFF;
+}
+
+.panel-header h3 {
+  margin: 0;
+  color: #00CCFF;
+  font-size: 16px;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #00CCFF;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.panel-content {
+  padding: 15px;
+}
+
+.help-content {
+  color: #FFFFFF;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.help-content p {
+  margin: 5px 0;
+}
+
+.help-content strong {
+  color: #00CCFF;
+}
+
+/* 战场图片样式 */
+.battle-image {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 3px;
+}
+
+/* 响应式调整 */
+@media (max-width: 1200px) {
+  .battlefield-container {
+    grid-template-columns: 25% 50% 25%;
+  }
+}
+
+@media (max-width: 992px) {
+  .battlefield-container {
+    grid-template-columns: 30% 40% 30%;
+  }
+}
+
+@media (max-width: 768px) {
+  .battlefield-container {
+    grid-template-columns: 100%;
+    grid-template-rows: auto auto auto auto;
+    grid-template-areas:
+      "center"
+      "left"
+      "right"
+      "bottom";
+    padding-top: 50px;
+  }
+  
+  .header-content {
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .bottom-panel {
+    flex-direction: column;
+  }
+}

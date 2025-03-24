@@ -1,0 +1,385 @@
+/* 战场模拟系统样式 */
+.battle-container {
+  width: 100%;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+  background-color: #000;
+  color: #00ffcc;
+  font-family: 'Arial', sans-serif;
+}
+
+/* DataV边框组件通用样式 */
+.dv-border-box-1, 
+.dv-border-box-2, 
+.dv-border-box-3, 
+.dv-border-box-4, 
+.dv-border-box-5, 
+.dv-border-box-6, 
+.dv-border-box-8, 
+.dv-border-box-10, 
+.dv-border-box-11, 
+.dv-border-box-12 {
+  width: 100%;
+  height: 100%;
+  --border-color: #00ffcc;
+  --background-color: rgba(0, 20, 20, 0.7);
+}
+
+/* 顶部标题栏 */
+.top-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.8), rgba(0, 50, 50, 0.8), rgba(0, 0, 0, 0.8));
+  padding: 0 20px;
+  z-index: 100;
+}
+
+.header-left, .header-right {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.header-center {
+  font-size: 20px;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+/* 主内容区 */
+.main-content {
+  position: absolute;
+  top: 40px;
+  left: 0;
+  right: 0;
+  bottom: 120px;
+  display: flex;
+}
+
+/* 左侧面板 */
+.left-panel {
+  width: 25%;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.panel-section {
+  background-color: rgba(0, 20, 20, 0.7);
+  padding: 10px;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #00ffcc;
+  border-bottom: 1px solid rgba(0, 255, 204, 0.3);
+  padding-bottom: 5px;
+}
+
+.map-section {
+  flex: 2;
+}
+
+.map-container {
+  width: 100%;
+  height: 100%;
+  background-image: url('https://i.imgur.com/XWnHEOF.jpg');
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.map-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle, rgba(0, 255, 204, 0.1), rgba(0, 50, 50, 0.5));
+}
+
+.stats-section {
+  display: flex;
+  justify-content: space-around;
+  padding: 15px;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-title {
+  font-size: 12px;
+  color: rgba(0, 255, 204, 0.7);
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: #00ffcc;
+}
+
+.radar-section {
+  flex: 1;
+}
+
+.radar-container {
+  width: 100%;
+  height: 100%;
+  min-height: 150px;
+}
+
+.beach-section {
+  flex: 1;
+}
+
+.beach-image {
+  width: 100%;
+  height: 120px;
+  background-image: url('https://i.imgur.com/JGQ9Pqm.jpg');
+  background-size: cover;
+  background-position: center;
+  border-radius: 3px;
+}
+
+/* 中央面板 */
+.center-panel {
+  flex: 1;
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.battle-frame {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.three-container {
+  width: 100%;
+  height: 100%;
+}
+
+.frame-corners .corner {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-color: #00ffcc;
+  border-style: solid;
+  z-index: 10;
+}
+
+.corner.top-left {
+  top: 0;
+  left: 0;
+  border-width: 2px 0 0 2px;
+}
+
+.corner.top-right {
+  top: 0;
+  right: 0;
+  border-width: 2px 2px 0 0;
+}
+
+.corner.bottom-left {
+  bottom: 0;
+  left: 0;
+  border-width: 0 0 2px 2px;
+}
+
+.corner.bottom-right {
+  bottom: 0;
+  right: 0;
+  border-width: 0 2px 2px 0;
+}
+
+/* 右侧面板 */
+.right-panel {
+  width: 25%;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.unit-stats {
+  flex: 2;
+}
+
+.stats-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.stat-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.stat-label {
+  width: 80px;
+  font-size: 12px;
+  color: rgba(0, 255, 204, 0.8);
+}
+
+.stat-bar {
+  flex: 1;
+  height: 8px;
+  background-color: rgba(0, 255, 204, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.stat-bar-fill {
+  height: 100%;
+  background-color: #00ffcc;
+  border-radius: 4px;
+}
+
+.aircraft-section {
+  flex: 1;
+}
+
+.aircraft-image {
+  width: 100%;
+  height: 150px;
+  background-image: url('https://i.imgur.com/pK7Ib9P.jpg');
+  background-size: cover;
+  background-position: center;
+  border-radius: 3px;
+}
+
+/* 底部面板 */
+.bottom-panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 120px;
+  display: flex;
+  padding: 10px 20px;
+}
+
+.logo-section {
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.game-logo {
+  font-size: 24px;
+  font-weight: bold;
+  color: #00ffcc;
+  letter-spacing: 2px;
+}
+
+.game-subtitle {
+  font-size: 14px;
+  color: rgba(0, 255, 204, 0.7);
+}
+
+.data-sections {
+  flex: 1;
+  display: flex;
+  gap: 20px;
+}
+
+.data-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 帮助按钮 */
+.help-btn {
+  position: absolute;
+  bottom: 130px;
+  right: 20px;
+  width: 30px;
+  height: 30px;
+  background-color: rgba(0, 20, 20, 0.7);
+  border: 1px solid #00ffcc;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #00ffcc;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+.help-btn:hover {
+  background-color: rgba(0, 50, 50, 0.9);
+}
+
+/* 帮助面板 */
+.help-panel {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 400px;
+  height: 300px;
+  z-index: 1001;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+}
+
+.panel-header h3 {
+  margin: 0;
+  color: #00ffcc;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #00ffcc;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.panel-content {
+  padding: 20px;
+}
+
+.help-content {
+  color: #00ffcc;
+  line-height: 1.6;
+}
+
+.help-content p {
+  margin: 10px 0;
+}
+
+/* 动画效果 */
+@keyframes pulse {
+  0% { opacity: 0.7; }
+  50% { opacity: 1; }
+  100% { opacity: 0.7; }
+}
+
+.stat-value, .game-logo {
+  animation: pulse 2s infinite;
+}

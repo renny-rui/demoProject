@@ -1,0 +1,349 @@
+<template>
+  <div class="battle-container">
+    <!-- 顶部标题栏 -->
+    <div class="top-header-container">
+      <div class="top-header">
+        <div class="header-content">
+          <div class="header-left">军事训练·模拟演练</div>
+          <div class="header-center">DUTY TRAINING SUPER SYSTEM</div>
+          <div class="header-right">数据监测中心</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 视频展示区域 -->
+    <div class="video-container">
+      <!-- 视频播放器 -->
+      <video ref="battleVideo" class="battle-video" controls autoplay loop muted playsinline preload="auto">
+        <source :src="videoUrl" type="video/mp4">
+        <source src="/videos/0001-0060.mp4" type="video/mp4">
+        <source src="/0001-0060.mp4" type="video/mp4">
+        您的浏览器不支持视频播放
+      </video>
+      
+      <!-- 备用iframe嵌入 -->
+      <div v-if="showIframe" class="iframe-container">
+        <iframe 
+          src="about:blank" 
+          ref="videoIframe" 
+          frameborder="0" 
+          allowfullscreen
+          class="video-iframe"
+        ></iframe>
+      </div>
+      
+      <!-- 四角装饰 -->
+      <div class="frame-corners">
+        <div class="corner top-left"></div>
+        <div class="corner top-right"></div>
+        <div class="corner bottom-left"></div>
+        <div class="corner bottom-right"></div>
+      </div>
+    </div>
+    
+    <!-- 帮助按钮 -->
+    <div class="help-btn" @click="showHelpPanel = !showHelpPanel">
+      <i class="el-icon-question"></i>
+    </div>
+    
+    <!-- 系统帮助面板 -->
+    <dv-border-box-8 v-if="showHelpPanel" class="help-panel">
+      <div class="panel-header">
+        <h3>系统帮助</h3>
+        <button @click="showHelpPanel = false" class="close-btn">×</button>
+      </div>
+      <div class="panel-content">
+        <div class="help-content">
+          <p><strong>忘记密码？</strong></p>
+          <p>请联系系统管理员重置密码</p>
+          <p>电话：400-123-4567</p>
+          <p>邮箱：admin@example.com</p>
+        </div>
+      </div>
+    </dv-border-box-8>
+  </div>
+</template>
+
+<script>
+// 导入组件
+import EChartsComponent from '@/components/EChartsComponent.vue';
+
+export default {
+  name: 'BattleSimulation',
+  components: {
+    EChartsComponent
+  },
+  data() {
+    return {
+      // 视频相关
+      videoUrl: require('@/assets/0001-0060.mp4'), // 使用require导入视频
+      showHelpPanel: false,
+      showIframe: false
+    };
+  },
+  mounted() {
+    console.log('军事作战态势分析页面已加载');
+    
+    // 确保视频加载和播放
+    this.$nextTick(() => {
+      const video = this.$refs.battleVideo;
+      if (video) {
+        // 添加事件监听器
+        video.addEventListener('error', (e) => {
+          console.error('视频加载错误:', e);
+          this.showIframe = true;
+          this.$refs.videoIframe.src = this.videoUrl;
+        });
+        
+        video.addEventListener('loadeddata', () => {
+          console.log('视频数据已加载');
+        });
+        
+        // 尝试加载视频
+        video.load();
+        
+        // 尝试播放视频
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+          playPromise.then(() => {
+            console.log('视频开始播放');
+          }).catch(error => {
+            console.error('自动播放失败:', error);
+            // 在用户交互后尝试播放
+            document.addEventListener('click', () => {
+              video.play().catch(e => console.error('点击后播放失败:', e));
+            }, { once: true });
+          });
+        }
+      }
+    });
+  },
+  beforeDestroy() {
+    // 清理资源
+    const video = this.$refs.battleVideo;
+    if (video) {
+      video.pause();
+      video.src = '';
+      video.load();
+    }
+  }
+};
+</script>
+
+<style scoped>
+.battle-container {
+  width: 100%;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+  background-color: #000;
+  color: #fff;
+  font-family: 'Arial', sans-serif;
+}
+
+/* 顶部标题栏样式 */
+.top-header-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 10;
+}
+
+.top-header {
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.7), rgba(0, 51, 102, 0.7), rgba(0, 0, 0, 0.7));
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid #0099CC;
+  box-shadow: 0 0 20px rgba(0, 153, 255, 0.5);
+}
+
+.header-content {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.header-left, .header-right {
+  color: #00CCFF;
+  font-size: 16px;
+  text-shadow: 0 0 5px #0099CC;
+}
+
+.header-center {
+  color: #FFFFFF;
+  font-size: 20px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px #00CCFF;
+}
+
+/* 视频容器样式 */
+.video-container {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 60px);
+  margin-top: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #000;
+}
+
+.battle-video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  z-index: 1;
+}
+
+.iframe-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+}
+
+.video-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* 四角装饰 */
+.frame-corners {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.corner {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  border: 2px solid #0099CC;
+  opacity: 0.8;
+}
+
+.top-left {
+  top: 10px;
+  left: 10px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.top-right {
+  top: 10px;
+  right: 10px;
+  border-left: none;
+  border-bottom: none;
+}
+
+.bottom-left {
+  bottom: 10px;
+  left: 10px;
+  border-right: none;
+  border-top: none;
+}
+
+.bottom-right {
+  bottom: 10px;
+  right: 10px;
+  border-left: none;
+  border-top: none;
+}
+
+/* 帮助按钮样式 */
+.help-btn {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  background-color: rgba(0, 102, 204, 0.5);
+  border: 1px solid #0099CC;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #FFFFFF;
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 100;
+  box-shadow: 0 0 10px #0099CC;
+  transition: all 0.3s ease;
+}
+
+.help-btn:hover {
+  background-color: rgba(0, 153, 255, 0.7);
+  box-shadow: 0 0 15px #00CCFF;
+}
+
+/* 帮助面板样式 */
+.help-panel {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 400px;
+  background-color: rgba(0, 20, 40, 0.9);
+  border: 1px solid #0099CC;
+  border-radius: 5px;
+  z-index: 1000;
+  box-shadow: 0 0 20px rgba(0, 153, 255, 0.7);
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  border-bottom: 1px solid #0099CC;
+}
+
+.panel-header h3 {
+  margin: 0;
+  color: #00CCFF;
+  font-size: 18px;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #FFFFFF;
+  font-size: 20px;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.close-btn:hover {
+  color: #FF3333;
+}
+
+.panel-content {
+  padding: 15px;
+}
+
+.help-content {
+  color: #FFFFFF;
+  line-height: 1.6;
+}
+
+.help-content p {
+  margin: 5px 0;
+}
+
+.help-content strong {
+  color: #00CCFF;
+}
+</style>

@@ -1,17 +1,61 @@
-
   /* 修改 Input 组件的背景颜色 */
   .el-input__inner {
-    background-color: #D8D8D8 !important;
-    opacity: 0.8;
+    background-color: #fff !important;
+    opacity: 1;
     color: black !important;
-    border:2px solid #ffffff
+    border: 1px solid #dcdfe6;
   }
   .el-input__inner::placeholder {
-    color: #F3F3F3 !important;
+    color: #000 !important;
     opacity: 1;
   }
   .el-card {
     background-color: #ffffff;
     /* color: #FFF; */
     cursor: pointer;
+}
+
+.floating-menu {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 10px;
+  border-radius: 5px 0 0 5px;
+  color: #fff;
+  width: 150px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.menu-header,
+.menu-content {
+  margin-bottom: 15px;
+}
+
+.menu-header h3,
+.menu-content h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.menu-content span {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.menu-item.download button {
+  background-color: #ffcc00;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.menu-item.download button:hover {
+  background-color: #e6b800;
 }

@@ -7,7 +7,6 @@
     <div class="login-card">
       <img src="../assets/cardTop.png" class="camouflage-header" alt="Card Top">
       <h2 class="system-title">后勤业务能力智能化考核评估系统</h2>
-      
       <div class="login-form">
         <div class="form-item">
           <div class="form-label">用户名/账号：</div>
@@ -37,17 +36,22 @@
               class="captcha-input" 
             />
             <div class="captcha-display" @click="generateCaptcha">
-              <span v-for="(digit, index) in captchaText" :key="index" :style="{ color: getRandomColor() }">{{ digit }}</span>
+              <canvas ref="captchaCanvas" width="120" height="40"></canvas>
             </div>
           </div>
         </div>
         
-        <el-button type="primary" class="login-button" @click="handleLogin">登录</el-button>
+        <el-button 
+          type="primary" 
+          class="login-button" 
+          @click="handleLogin"
+          :loading="loading"
+        >{{ loading ? '登录中...' : '登录' }}</el-button>
         
         <div class="login-options">
-          <span class="option-text">忘记密码？</span>
+          <span class="option-text" @click="goToForgotPassword">忘记密码？</span>
           <span class="divider">|</span>
-          <span class="option-text">注册新账号</span>
+          <span class="option-text" @click="goToRegister">注册新账号</span>
         </div>
       </div>
     </div>
@@ -55,8 +59,11 @@
 </template>
 
 <script>
+import { login } from '../api/auth';
+import Cookies from 'js-cookie';
+
 export default {
-  name: 'UserLogin',
+  name: 'LoginView',
   data() {
     return {
       form: {
@@ -65,7 +72,8 @@ export default {
         captcha: ''
       },
       captchaText: '',
-      captchaColors: []
+      captchaColors: [],
+      loading: false
     }
   },
   mounted() {
@@ -73,32 +81,154 @@ export default {
   },
   methods: {
     generateCaptcha() {
-      const chars = '0123456789'
+      const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
       let captcha = ''
       for (let i = 0; i < 4; i++) {
         captcha += chars.charAt(Math.floor(Math.random() * chars.length))
       }
       this.captchaText = captcha
       
-      // Generate colors for each digit
-      this.captchaColors = Array(4).fill().map(() => this.getRandomColor())
+      // Draw captcha on canvas
+      this.$nextTick(() => {
+        this.drawCaptcha()
+      })
     },
-    getRandomColor() {
-      const colors = ['#f00', '#00f', '#080', '#f0f', '#f80', '#0ff']
-      return colors[Math.floor(Math.random() * colors.length)]
-    },
-    handleLogin() {
-      if (this.form.username === 'admin' && this.form.password === '123456') {
-        if (this.form.captcha !== this.captchaText) {
-          this.$message.error('验证码错误，请重新输入！')
-          this.generateCaptcha()
-          return
-        }
-        this.$message.success('登录成功！')
-        this.$router.push('/dashboard')
-      } else {
-        this.$message.error('用户名或密码错误！')
+    drawCaptcha() {
+      const canvas = this.$refs.captchaCanvas
+      const ctx = canvas.getContext('2d')
+      const width = canvas.width
+      const height = canvas.height
+      
+      // Clear canvas
+      ctx.fillStyle = '#f0f0f0'
+      ctx.fillRect(0, 0, width, height)
+      
+      // Draw random dots
+      for (let i = 0; i < 50; i++) {
+        ctx.fillStyle = this.getRandomColor(0.5)
+        ctx.beginPath()
+        ctx.arc(
+          Math.random() * width,
+          Math.random() * height,
+          Math.random() * 2,
+          0,
+          Math.PI * 2
+        )
+        ctx.fill()
       }
+      
+      // Draw random lines
+      for (let i = 0; i < 5; i++) {
+        ctx.strokeStyle = this.getRandomColor(0.5)
+        ctx.beginPath()
+        ctx.moveTo(Math.random() * width, Math.random() * height)
+        ctx.lineTo(Math.random() * width, Math.random() * height)
+        ctx.lineWidth = 1
+        ctx.stroke()
+      }
+      
+      // Draw captcha text
+      ctx.font = 'bold 24px Arial'
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      
+      // Draw each character with rotation and different colors
+      for (let i = 0; i < this.captchaText.length; i++) {
+        ctx.fillStyle = this.getRandomColor(1)
+        ctx.save()
+        ctx.translate(20 + i * 25, height / 2)
+        ctx.rotate((Math.random() - 0.5) * 0.4)
+        ctx.fillText(this.captchaText[i], 0, 0)
+        ctx.restore()
+      }
+    },
+    getRandomColor(alpha = 1) {
+      const r = Math.floor(Math.random() * 200)
+      const g = Math.floor(Math.random() * 200)
+      const b = Math.floor(Math.random() * 200)
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`
+    },
+    validateForm() {
+      if (!this.form.username) {
+        this.$message.error('请输入用户名');
+        return false;
+      }
+      if (!this.form.password) {
+        this.$message.error('请输入密码');
+        return false;
+      }
+      if (!this.form.captcha) {
+        this.$message.error('请输入验证码');
+        return false;
+      }
+      if (this.form.captcha.toUpperCase() !== this.captchaText) {
+        this.$message.error('验证码错误，请重新输入！');
+        this.generateCaptcha();
+        return false;
+      }
+      return true;
+    },
+    async handleLogin() {
+      if (!this.validateForm()) {
+        return;
+      }
+      
+      this.loading = true;
+      try {
+        const response = await login(this.form.username, this.form.password);
+        console.log('登录响应:', response);
+        
+        if (response && response.tokencontent) {
+          // 保存token到 localStorage
+          localStorage.setItem('token', response.tokencontent);
+          
+          // 构造基本用户信息并保存
+          const userInfo = {
+            username: this.form.username,
+            role: 1, // 默认为普通用户角色
+          };
+          localStorage.setItem('userInfo', JSON.stringify(userInfo));
+          
+          // 保存到 cookie
+          Cookies.set('Authorization', `Bearer ${response.tokencontent}`, { 
+            expires: 1,
+            path: '/',
+            sameSite: 'Lax'
+          });
+          
+          this.$message.success('登录成功');
+          
+          // 直接跳转到作战态势分析页面
+          this.$router.replace('/battle-simulation');
+        } else {
+          throw new Error('登录失败：未收到有效的token');
+        }
+      } catch (error) {
+        console.error('登录失败:', error);
+        this.$message.error(error.message || '登录失败，请稍后重试');
+        this.generateCaptcha();
+      } finally {
+        this.loading = false;
+      }
+    },
+    goToRegister() {
+      this.$router.push('/register')
+    },
+    goToForgotPassword() {
+      // 显示忘记密码提示，不需要手机验证，而是提示联系管理员
+      this.$alert(
+        `<div>
+          <p>请联系管理员重置您的密码</p>
+          <p>管理员联系方式：</p>
+          <p>电话：400-123-4567</p>
+          <p>邮箱：admin@example.com</p>
+        </div>`,
+        '忘记密码',
+        {
+          dangerouslyUseHTMLString: true,
+          confirmButtonText: '确定'
+        }
+      );
     }
   }
 }
@@ -183,7 +313,7 @@ export default {
 }
 
 .captcha-display {
-  width: 100px;
+  width: 120px;
   height: 40px;
   margin-left: 10px;
   background-color: white;

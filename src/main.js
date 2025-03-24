@@ -4,8 +4,10 @@ import router from './router'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import '@/assets/global.css'
+import dataV from '@jiaminghi/data-view'
 
 Vue.use(ElementUI)
+Vue.use(dataV)
 Vue.config.productionTip = false
 
 new Vue({
