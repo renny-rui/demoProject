@@ -1,475 +1,169 @@
 <template>
   <div class="task-config">
+
+    <div class="page-header">
+      <div class="header-left">
+        <div class="back-button" @click="goBack">
+          <i class="el-icon-arrow-left"></i> 返回
+        </div>
+        <h2 class="page-title">任务基本设置</h2>
+      </div>
+    </div>
+
     <!-- 任务设置 -->
     <el-card class="box-card">
 
       <el-divider content-position="left">
         <h3>任务设置</h3>
       </el-divider>
-      <el-form :model="taskForm" label-width="100px">
+      <el-form :model="taskForm.gameConfig" label-width="100px">
 
         <el-row :gutter="20">
 
           <h4>基本设置：</h4>
           <el-col :span="8">
             <el-form-item label="最大人数">
-              <el-input v-model="taskForm.maxplayer" placeholder="最大人数"></el-input>
+              <el-input v-model="taskForm.gameConfig.baseSetting.maxPlayers" placeholder="请输入最大人数"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="最长时间">
-              <el-input v-model="taskForm.overtime" placeholder="120min"></el-input>
+              <el-input v-model="taskForm.gameConfig.baseSetting.maxDuration" placeholder="请输入最长时间"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="房主IP">
+              <el-input v-model="taskForm.gameConfig.baseSetting.hostIP" placeholder="请输入房主IP"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
 
         <!-- 战场配置 -->
         <h4>战场配置：</h4>
-        <el-row :gutter="20">
-          <el-col :span="8">
-            <el-form-item label="地形">
-              <el-select v-model="taskForm.terrain">
-                <el-option label="岸滩" value="beach"></el-option>
-                <el-option label="雨林" value="rainforest"></el-option>
-                <el-option label="战舰" value="ship"></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="时间">
-              <el-select v-model="taskForm.time">
-                <el-option label="夜间" value="night"></el-option>
-                <el-option label="白天" value="day"></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-        </el-row>
+
+        <!-- 地形选择 -->
+        <div class="map-selection">
+          <h5>地形选择</h5>
+          <div class="map-cards">
+            <div class="map-card" :class="{ 'active': taskForm.gameConfig.warfareSetting.terrain === 'rainforest' }"
+              @click="taskForm.gameConfig.warfareSetting.terrain = 'rainforest'">
+              <div class="map-image" :style="{ backgroundImage: 'url(' + require('../../assets/images1.jpg') + ')' }">
+              </div>
+              <div class="map-name">丛林</div>
+            </div>
+            <div class="map-card" :class="{ 'active': taskForm.gameConfig.warfareSetting.terrain === 'beach' }"
+              @click="taskForm.gameConfig.warfareSetting.terrain = 'beach'">
+              <div class="map-image" :style="{ backgroundImage: 'url(' + require('../../assets/images2.jpg') + ')' }">
+              </div>
+              <div class="map-name">岸滩</div>
+            </div>
+            <div class="map-card" :class="{ 'active': taskForm.gameConfig.warfareSetting.terrain === 'ship' }"
+              @click="taskForm.gameConfig.warfareSetting.terrain = 'ship'">
+              <div class="map-image" :style="{ backgroundImage: 'url(' + require('../../assets/images3.jpg') + ')' }">
+              </div>
+              <div class="map-name">海上</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 时间选择 -->
+        <div class="time-selection">
+          <h5>时间选择</h5>
+          <div class="time-cards">
+            <div class="time-card" :class="{ 'active': taskForm.gameConfig.warfareSetting.time === 'dawn' }"
+              @click="taskForm.gameConfig.warfareSetting.time = 'dawn'">
+              <div class="time-image" style="background-color: #f08080;"></div>
+              <div class="time-name">黎明</div>
+            </div>
+            <div class="time-card" :class="{ 'active': taskForm.gameConfig.warfareSetting.time === 'morning' }"
+              @click="taskForm.gameConfig.warfareSetting.time = 'morning'">
+              <div class="time-image" style="background-color: #87ceeb;"></div>
+              <div class="time-name">早晨</div>
+            </div>
+            <div class="time-card" :class="{ 'active': taskForm.gameConfig.warfareSetting.time === 'noon' }"
+              @click="taskForm.gameConfig.warfareSetting.time = 'noon'">
+              <div class="time-image" style="background-color: #ffd700;"></div>
+              <div class="time-name">正午</div>
+            </div>
+            <div class="time-card" :class="{ 'active': taskForm.gameConfig.warfareSetting.time === 'afternoon' }"
+              @click="taskForm.gameConfig.warfareSetting.time = 'afternoon'">
+              <div class="time-image" style="background-color: #ffa500;"></div>
+              <div class="time-name">下午</div>
+            </div>
+            <div class="time-card" :class="{ 'active': taskForm.gameConfig.warfareSetting.time === 'dusk' }"
+              @click="taskForm.gameConfig.warfareSetting.time = 'dusk'">
+              <div class="time-image" style="background-color: #ff4500;"></div>
+              <div class="time-name">黄昏</div>
+            </div>
+            <div class="time-card" :class="{ 'active': taskForm.gameConfig.warfareSetting.time === 'night' }"
+              @click="taskForm.gameConfig.warfareSetting.time = 'night'">
+              <div class="time-image" style="background-color: #191970;"></div>
+              <div class="time-name">夜间</div>
+            </div>
+          </div>
+        </div>
 
         <el-row :gutter="20">
           <el-col :span="8">
             <el-form-item label="炮火间隔">
-              <el-input v-model="taskForm.averageinterval" placeholder="10s"></el-input>
+              <el-input v-model="taskForm.gameConfig.warfareSetting.artilleryStrategy.averageInterval"
+                placeholder="请输入间隔时间(秒)"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="波动范围">
-              <el-input v-model="taskForm.fluctuationinterval" placeholder="-8, -2"></el-input>
+            <el-form-item label="最小波动">
+              <el-input v-model="taskForm.gameConfig.warfareSetting.artilleryStrategy.minRandomInterval"
+                placeholder="请输入最小波动值"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="最大波动">
+              <el-input v-model="taskForm.gameConfig.warfareSetting.artilleryStrategy.maxRandomInterval"
+                placeholder="请输入最大波动值"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
 
-        <el-row :gutter="20">
+        <!-- 天气配置 -->
+        <h4>天气配置：</h4>
+        <el-row>
+          <el-col :span="24">
+            <el-button type="primary" icon="el-icon-plus" @click="addWeather" style="margin-bottom: 15px;"
+              class="add-button">新增天气</el-button>
+          </el-col>
+        </el-row>
+
+        <el-row :gutter="20" v-for="(weather, index) in taskForm.gameConfig.warfareSetting.weather" :key="weather.index"
+          style="margin-bottom: 15px;">
           <el-col :span="8">
-            <el-form-item label="天气类型">
-              <el-select v-model="taskForm.weatherlist.type">
-                <el-option label="大雨" value="heavyRain"></el-option>
+            <el-form-item :label="'天气类型 ' + (index + 1)">
+              <el-select v-model="weather.type" placeholder="选择天气类型">
                 <el-option label="晴天" value="sunny"></el-option>
-                <el-option label="雾天" value="fog"></el-option>
+                <el-option label="雨天" value="rainy"></el-option>
+                <el-option label="雾天" value="foggy"></el-option>
+                <el-option label="雪天" value="snowy"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="持续时间">
-              <el-input v-model="taskForm.weatherlist.duration" placeholder="10s"></el-input>
+            <el-form-item :label="'持续时间 ' + (index + 1)">
+              <el-input v-model="weather.duration" placeholder="请输入持续时间"></el-input>
             </el-form-item>
           </el-col>
-          <el-button type="primary" icon="el-icon-plus" @click="addWeather" class="add-button">新增天气</el-button>
+          <el-col :span="4">
+            <el-form-item label=" ">
+              <el-button type="danger" icon="el-icon-delete" @click="removeWeather(index)" circle></el-button>
+            </el-form-item>
+          </el-col>
         </el-row>
+        <el-form-item style="display: flex;justify-content: center;">
+          <el-button type="primary" @click="submitForm" class="submit-button">下一步</el-button>
+        </el-form-item>
+
       </el-form>
     </el-card>
 
 
-    <!-- 任务配置 -->
-    <el-card class="box-card">
-      <el-divider content-position="left">
-        <h3>任务配置</h3>
-      </el-divider>
-
-      <el-form :model="taskForm" label-width="100px">
-        <el-row :gutter="20">
-          <el-col :span="8">
-            <el-form-item label="ID">
-              <el-input v-model="taskForm.taskID"></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="行动名称">
-              <el-input v-model="taskForm.actionName"></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="开始时间">
-              <el-date-picker v-model="taskForm.startTime" type="date" placeholder="选择日期"></el-date-picker>
-            </el-form-item>
-          </el-col>
-        </el-row>
-      </el-form>
-
-      <div style="padding-left: 75px;">
-        <el-tabs v-model="activeName" @tab-click="handleClick">
-          <el-tab-pane label="油料前送" name="first">
-            <el-button type="primary" icon="el-icon-plus" @click="addTeam" class="add-button">新增团队</el-button>
-            <el-collapse v-model="activeTeam">
-              <el-collapse-item v-for="(team, index) in taskForm.teams" :key="index" :name="index">
-                <template slot="title">
-                  <span>团队 ID: {{ team.id }}</span>
-                </template>
-                <el-form label-width="100px">
-                  <el-form-item label="团队 ID">
-                    <el-input v-model="team.id"></el-input>
-                  </el-form-item>
-
-                  <!-- 成员配置 -->
-                  <el-button type="primary" icon="el-icon-plus" @click="addMember(index)"
-                    class="add-button">新增成员</el-button>
-                  <el-card v-for="(member, idx) in team.members" :key="idx" shadow="always">
-                    <el-row :gutter="20">
-                      <el-col :span="8">
-                        <el-form-item label="成员 ID">
-                          <el-input v-model="member.id"></el-input>
-                        </el-form-item>
-                      </el-col>
-                      <el-col :span="8">
-                        <el-form-item label="设备 IP">
-                          <el-input v-model="member.deviceIP"></el-input>
-                        </el-form-item>
-                      </el-col>
-                      <el-col :span="8">
-                        <el-form-item label="成员身份">
-                          <el-select v-model="member.role">
-                            <el-option label="提油桶" value="fuelCarrier"></el-option>
-                            <el-option label="狙击手" value="sniper"></el-option>
-                          </el-select>
-                        </el-form-item>
-                      </el-col>
-                    </el-row>
-                    <el-row>
-                      <div style="padding-left: 10px;">
-                        <el-form-item label="是否追踪">
-                          <el-radio v-model="radio" label="1">是</el-radio>
-                          <el-radio v-model="radio" label="2">否</el-radio>
-                        </el-form-item>
-                      </div>
-                      <div style="padding-left: 10px;">
-                        <el-form-item label="追踪模式">
-                          <el-radio v-model="trackerType" label="1">全身追踪</el-radio>
-                          <el-radio v-model="trackerType" label="2">独立追踪</el-radio>
-                        </el-form-item>
-                      </div>
-                    </el-row>
-
-
-                    <el-button type="danger" icon="el-icon-delete" @click="removeMember(index, idx)">删除成员</el-button>
-                  </el-card>
-                </el-form>
-              </el-collapse-item>
-            </el-collapse>
-          </el-tab-pane>
-          <el-tab-pane label="燃料加注" name="second"><el-button type="primary" icon="el-icon-plus" @click="addTeam" class="add-button">新增团队</el-button>
-            <el-collapse v-model="activeTeam">
-              <el-collapse-item v-for="(team, index) in taskForm.teams" :key="index" :name="index">
-                <template slot="title">
-                  <span>团队 ID: {{ team.id }}</span>
-                </template>
-                <el-form label-width="100px">
-                  <el-form-item label="团队 ID">
-                    <el-input v-model="team.id"></el-input>
-                  </el-form-item>
-
-                  <!-- 成员配置 -->
-                  <el-button type="primary" icon="el-icon-plus" @click="addMember(index)"
-                    class="add-button">新增成员</el-button>
-                  <el-card v-for="(member, idx) in team.members" :key="idx" shadow="always">
-                    <el-row :gutter="20">
-                      <el-col :span="8">
-                        <el-form-item label="成员 ID">
-                          <el-input v-model="member.id"></el-input>
-                        </el-form-item>
-                      </el-col>
-                      <el-col :span="8">
-                        <el-form-item label="设备 IP">
-                          <el-input v-model="member.deviceIP"></el-input>
-                        </el-form-item>
-                      </el-col>
-                      <el-col :span="8">
-                        <el-form-item label="成员身份">
-                          <el-select v-model="member.role">
-                            <el-option label="提油桶" value="fuelCarrier"></el-option>
-                            <el-option label="狙击手" value="sniper"></el-option>
-                          </el-select>
-                        </el-form-item>
-                      </el-col>
-                    </el-row>
-                    <el-row>
-                      <div style="padding-left: 10px;">
-                        <el-form-item label="是否追踪">
-                          <el-radio v-model="radio" label="1">是</el-radio>
-                          <el-radio v-model="radio" label="2">否</el-radio>
-                        </el-form-item>
-                      </div>
-                      <div style="padding-left: 10px;">
-                        <el-form-item label="追踪模式">
-                          <el-radio v-model="trackerType" label="1">全身追踪</el-radio>
-                          <el-radio v-model="trackerType" label="2">独立追踪</el-radio>
-                        </el-form-item>
-                      </div>
-                    </el-row>
-
-
-                    <el-button type="danger" icon="el-icon-delete" @click="removeMember(index, idx)">删除成员</el-button>
-                  </el-card>
-                </el-form>
-              </el-collapse-item>
-            </el-collapse></el-tab-pane>
-          <el-tab-pane label="热食制作" name="third"><el-button type="primary" icon="el-icon-plus" @click="addTeam" class="add-button">新增团队</el-button>
-            <el-collapse v-model="activeTeam">
-              <el-collapse-item v-for="(team, index) in taskForm.teams" :key="index" :name="index">
-                <template slot="title">
-                  <span>团队 ID: {{ team.id }}</span>
-                </template>
-                <el-form label-width="100px">
-                  <el-form-item label="团队 ID">
-                    <el-input v-model="team.id"></el-input>
-                  </el-form-item>
-
-                  <!-- 成员配置 -->
-                  <el-button type="primary" icon="el-icon-plus" @click="addMember(index)"
-                    class="add-button">新增成员</el-button>
-                  <el-card v-for="(member, idx) in team.members" :key="idx" shadow="always">
-                    <el-row :gutter="20">
-                      <el-col :span="8">
-                        <el-form-item label="成员 ID">
-                          <el-input v-model="member.id"></el-input>
-                        </el-form-item>
-                      </el-col>
-                      <el-col :span="8">
-                        <el-form-item label="设备 IP">
-                          <el-input v-model="member.deviceIP"></el-input>
-                        </el-form-item>
-                      </el-col>
-                      <el-col :span="8">
-                        <el-form-item label="成员身份">
-                          <el-select v-model="member.role">
-                            <el-option label="提油桶" value="fuelCarrier"></el-option>
-                            <el-option label="狙击手" value="sniper"></el-option>
-                          </el-select>
-                        </el-form-item>
-                      </el-col>
-                    </el-row>
-                    <el-row>
-                      <div style="padding-left: 10px;">
-                        <el-form-item label="是否追踪">
-                          <el-radio v-model="radio" label="1">是</el-radio>
-                          <el-radio v-model="radio" label="2">否</el-radio>
-                        </el-form-item>
-                      </div>
-                      <div style="padding-left: 10px;">
-                        <el-form-item label="追踪模式">
-                          <el-radio v-model="trackerType" label="1">全身追踪</el-radio>
-                          <el-radio v-model="trackerType" label="2">独立追踪</el-radio>
-                        </el-form-item>
-                      </div>
-                    </el-row>
-
-
-                    <el-button type="danger" icon="el-icon-delete" @click="removeMember(index, idx)">删除成员</el-button>
-                  </el-card>
-                </el-form>
-              </el-collapse-item>
-            </el-collapse></el-tab-pane>
-          <el-tab-pane label="热食前送" name="fourth">
-            <el-button type="primary" icon="el-icon-plus" @click="addTeam" class="add-button">新增团队</el-button>
-            <el-collapse v-model="activeTeam">
-              <el-collapse-item v-for="(team, index) in taskForm.teams" :key="index" :name="index">
-                <template slot="title">
-                  <span>团队 ID: {{ team.id }}</span>
-                </template>
-                <el-form label-width="100px">
-                  <el-form-item label="团队 ID">
-                    <el-input v-model="team.id"></el-input>
-                  </el-form-item>
-
-                  <!-- 成员配置 -->
-                  <el-button type="primary" icon="el-icon-plus" @click="addMember(index)"
-                    class="add-button">新增成员</el-button>
-                  <el-card v-for="(member, idx) in team.members" :key="idx" shadow="always">
-                    <el-row :gutter="20">
-                      <el-col :span="8">
-                        <el-form-item label="成员 ID">
-                          <el-input v-model="member.id"></el-input>
-                        </el-form-item>
-                      </el-col>
-                      <el-col :span="8">
-                        <el-form-item label="设备 IP">
-                          <el-input v-model="member.deviceIP"></el-input>
-                        </el-form-item>
-                      </el-col>
-                      <el-col :span="8">
-                        <el-form-item label="成员身份">
-                          <el-select v-model="member.role">
-                            <el-option label="提油桶" value="fuelCarrier"></el-option>
-                            <el-option label="狙击手" value="sniper"></el-option>
-                          </el-select>
-                        </el-form-item>
-                      </el-col>
-                    </el-row>
-                    <el-row>
-                      <div style="padding-left: 10px;">
-                        <el-form-item label="是否追踪">
-                          <el-radio v-model="radio" label="1">是</el-radio>
-                          <el-radio v-model="radio" label="2">否</el-radio>
-                        </el-form-item>
-                      </div>
-                      <div style="padding-left: 10px;">
-                        <el-form-item label="追踪模式">
-                          <el-radio v-model="trackerType" label="1">全身追踪</el-radio>
-                          <el-radio v-model="trackerType" label="2">独立追踪</el-radio>
-                        </el-form-item>
-                      </div>
-                    </el-row>
-
-
-                    <el-button type="danger" icon="el-icon-delete" @click="removeMember(index, idx)">删除成员</el-button>
-                  </el-card>
-                </el-form>
-              </el-collapse-item>
-            </el-collapse>
-          </el-tab-pane>
-          <el-tab-pane label="装备抢修" name="fifth"><el-button type="primary" icon="el-icon-plus" @click="addTeam" class="add-button">新增团队</el-button>
-            <el-collapse v-model="activeTeam">
-              <el-collapse-item v-for="(team, index) in taskForm.teams" :key="index" :name="index">
-                <template slot="title">
-                  <span>团队 ID: {{ team.id }}</span>
-                </template>
-                <el-form label-width="100px">
-                  <el-form-item label="团队 ID">
-                    <el-input v-model="team.id"></el-input>
-                  </el-form-item>
-
-                  <!-- 成员配置 -->
-                  <el-button type="primary" icon="el-icon-plus" @click="addMember(index)"
-                    class="add-button">新增成员</el-button>
-                  <el-card v-for="(member, idx) in team.members" :key="idx" shadow="always">
-                    <el-row :gutter="20">
-                      <el-col :span="8">
-                        <el-form-item label="成员 ID">
-                          <el-input v-model="member.id"></el-input>
-                        </el-form-item>
-                      </el-col>
-                      <el-col :span="8">
-                        <el-form-item label="设备 IP">
-                          <el-input v-model="member.deviceIP"></el-input>
-                        </el-form-item>
-                      </el-col>
-                      <el-col :span="8">
-                        <el-form-item label="成员身份">
-                          <el-select v-model="member.role">
-                            <el-option label="提油桶" value="fuelCarrier"></el-option>
-                            <el-option label="狙击手" value="sniper"></el-option>
-                          </el-select>
-                        </el-form-item>
-                      </el-col>
-                    </el-row>
-                    <el-row>
-                      <div style="padding-left: 10px;">
-                        <el-form-item label="是否追踪">
-                          <el-radio v-model="radio" label="1">是</el-radio>
-                          <el-radio v-model="radio" label="2">否</el-radio>
-                        </el-form-item>
-                      </div>
-                      <div style="padding-left: 10px;">
-                        <el-form-item label="追踪模式">
-                          <el-radio v-model="trackerType" label="1">全身追踪</el-radio>
-                          <el-radio v-model="trackerType" label="2">独立追踪</el-radio>
-                        </el-form-item>
-                      </div>
-                    </el-row>
-
-
-                    <el-button type="danger" icon="el-icon-delete" @click="removeMember(index, idx)">删除成员</el-button>
-                  </el-card>
-                </el-form>
-              </el-collapse-item>
-            </el-collapse></el-tab-pane>
-          <el-tab-pane label="卫生勤务" name="sixth">
-            <el-button type="primary" icon="el-icon-plus" @click="addTeam" class="add-button">新增团队</el-button>
-            <el-collapse v-model="activeTeam">
-              <el-collapse-item v-for="(team, index) in taskForm.teams" :key="index" :name="index">
-                <template slot="title">
-                  <span>团队 ID: {{ team.id }}</span>
-                </template>
-                <el-form label-width="100px">
-                  <el-form-item label="团队 ID">
-                    <el-input v-model="team.id"></el-input>
-                  </el-form-item>
-
-                  <!-- 成员配置 -->
-                  <el-button type="primary" icon="el-icon-plus" @click="addMember(index)"
-                    class="add-button">新增成员</el-button>
-                  <el-card v-for="(member, idx) in team.members" :key="idx" shadow="always">
-                    <el-row :gutter="20">
-                      <el-col :span="8">
-                        <el-form-item label="成员 ID">
-                          <el-input v-model="member.id"></el-input>
-                        </el-form-item>
-                      </el-col>
-                      <el-col :span="8">
-                        <el-form-item label="设备 IP">
-                          <el-input v-model="member.deviceIP"></el-input>
-                        </el-form-item>
-                      </el-col>
-                      <el-col :span="8">
-                        <el-form-item label="成员身份">
-                          <el-select v-model="member.role">
-                            <el-option label="提油桶" value="fuelCarrier"></el-option>
-                            <el-option label="狙击手" value="sniper"></el-option>
-                          </el-select>
-                        </el-form-item>
-                      </el-col>
-                    </el-row>
-                    <el-row>
-                      <div style="padding-left: 10px;">
-                        <el-form-item label="是否追踪">
-                          <el-radio v-model="radio" label="1">是</el-radio>
-                          <el-radio v-model="radio" label="2">否</el-radio>
-                        </el-form-item>
-                      </div>
-                      <div style="padding-left: 10px;">
-                        <el-form-item label="追踪模式">
-                          <el-radio v-model="trackerType" label="1">全身追踪</el-radio>
-                          <el-radio v-model="trackerType" label="2">独立追踪</el-radio>
-                        </el-form-item>
-                      </div>
-                      <el-row :gutter="20">
-                        <el-col :span="8">
-                          <el-form-item label="macID">
-                          <el-select v-model="member.macID">
-                            <el-option label="SN-12345678" value="fuelCarrier"></el-option>
-                            <el-option label="SN-12345678" value="sniper"></el-option>
-                          </el-select>
-                        </el-form-item>
-                        </el-col>
-                        <el-col :span="8">
-                          <el-form-item label="用途">
-                          <el-select v-model="member.macID">
-                            <el-option label="手切面伤" value="fuelCarrier"></el-option>
-                            <el-option label="手切面伤" value="sniper"></el-option>
-                          </el-select>
-                        </el-form-item>
-                        </el-col>
-                      </el-row>
-                    </el-row>
-
-
-                    <el-button type="danger" icon="el-icon-delete" @click="removeMember(index, idx)">删除成员</el-button>
-                  </el-card>
-                </el-form>
-              </el-collapse-item>
-            </el-collapse>
-          </el-tab-pane>
-        </el-tabs>
-      </div>
-    </el-card>
 
 
 
@@ -480,58 +174,58 @@
 export default {
   data() {
     return {
-      radio: 1,
-      trackerType: 1,
-      activeName: 'first',
-      activeTeam: [],
       taskForm: {
-        maxPeople: 24,
-        maxTime: "120min",
-        terrain: "beach",
-        time: "night",
-        fireInterval: "10s",
-        fluctuationRange: "-8, -2",
-        weatherlist: {
-          weathertype: "heavyRain",
-          duration: "10s"
-        },
-        taskID: "01",
-        actionName: "飓风行动",
-        startTime: null,
-        teams: [
-          {
-            id: "001",
-            members: [
+        gameConfig: {
+          baseSetting: {
+            maxPlayers: '',
+            maxDuration: '',
+            hostIP: ''
+          },
+          warfareSetting: {
+            terrain: '',
+            time: '',
+            artilleryStrategy: {
+              averageInterval: '',
+              minRandomInterval: '',
+              maxRandomInterval: ''
+            },
+            weather: [
               {
-                id: "0001",
-                deviceIP: "192.168.1.1",
-                role: "fuelCarrier"
+                index: 0,
+                type: '',
+                duration: ''
               }
             ]
           }
-        ]
+        }
       }
     };
   },
   methods: {
-    handleClick(tab, event) {
-      console.log(tab, event);
-    },
-    addTeam() {
-      this.taskForm.teams.push({
-        id: String(this.taskForm.teams.length + 1).padStart(3, "0"),
-        members: []
+    addWeather() {
+      const newIndex = this.taskForm.gameConfig.warfareSetting.weather.length;
+      this.taskForm.gameConfig.warfareSetting.weather.push({
+        index: newIndex,
+        type: '',
+        duration: ''
       });
     },
-    addMember(teamIndex) {
-      this.taskForm.teams[teamIndex].members.push({
-        id: String(this.taskForm.teams[teamIndex].members.length + 1).padStart(4, "0"),
-        deviceIP: "",
-        role: ""
+    removeWeather(index) {
+      this.taskForm.gameConfig.warfareSetting.weather.splice(index, 1);
+      // Update indexes after removal
+      this.taskForm.gameConfig.warfareSetting.weather.forEach((item, idx) => {
+        item.index = idx;
       });
     },
-    removeMember(teamIndex, memberIndex) {
-      this.taskForm.teams[teamIndex].members.splice(memberIndex, 1);
+    submitForm() {
+      // Store form data in localStorage for access in TaskAssignment
+      localStorage.setItem('taskFormData', JSON.stringify(this.taskForm));
+      
+      // Navigate to the TaskAssignment page
+      this.$router.push('/tasks/task-assignment');
+    },
+    goBack() {
+      this.$router.go(-1); // Navigate back to previous page
     }
   }
 };
@@ -543,6 +237,97 @@ export default {
 }
 
 .add-button {
+  background-color: #409EFF !important;
+  border-color: #409EFF !important;
+}
+
+.map-selection,
+.time-selection {
+  margin-bottom: 20px;
+}
+
+.map-cards,
+.time-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.map-card,
+.time-card {
+  margin: 10px;
+  width: calc(33.33% - 20px);
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.time-card {
+  width: calc(33.33% - 20px);
+}
+
+.map-card.active,
+.time-card.active {
+  border-color: #409EFF;
+  box-shadow: 0 4px 8px rgba(64, 158, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.map-image,
+.time-image {
+  width: 100%;
+  height: 150px;
+  background-size: cover;
+  background-position: center;
+}
+
+.map-name,
+.time-name {
+  text-align: center;
+  padding: 10px;
+  font-weight: bold;
+  font-size: 15px;
+  background-color: #f9f9f9;
+  border-top: 1px solid #eee;
+}
+
+.day-image {
+  background-color: #87ceeb;
+}
+
+.night-image {
+  background-color: #191970;
+}
+
+h4 {
+  margin-top: 20px;
+  margin-bottom: 15px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+h5 {
+  margin-top: 15px;
+  margin-bottom: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #444;
+}
+
+.el-form-item__label {
+  font-size: 15px !important;
+  font-weight: 500 !important;
+}
+
+.add-button {
+  background-color: #409EFF !important;
+}
+
+.submit-button {
   background-color: #409EFF !important;
   border-color: #409EFF !important;
 }

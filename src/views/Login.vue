@@ -3,51 +3,34 @@
     <div class="logo-container">
       <img class="logo" src="../assets/logo.png" alt="Logo">
     </div>
-    
+
     <div class="login-card">
       <img src="../assets/cardTop.png" class="camouflage-header" alt="Card Top">
       <h2 class="system-title">后勤业务能力智能化考核评估系统</h2>
       <div class="login-form">
         <div class="form-item">
           <div class="form-label">用户名/账号：</div>
-          <el-input
-            v-model="form.username"
-            placeholder="请输入用户名/账号"
-            class="login-input"
-          />
+          <el-input v-model="form.username" placeholder="请输入用户名/账号" class="login-input" />
         </div>
-        
+
         <div class="form-item">
           <div class="form-label">密码：</div>
-          <el-input 
-            v-model="form.password" 
-            type="password"
-            placeholder="请输入密码"
-            class="login-input"
-          />
+          <el-input v-model="form.password" type="password" placeholder="请输入密码" class="login-input" />
         </div>
-        
+
         <div class="form-item">
           <div class="form-label">验证码：</div>
           <div class="captcha-box">
-            <el-input 
-              v-model="form.captcha" 
-              placeholder="请输入验证码" 
-              class="captcha-input" 
-            />
+            <el-input v-model="form.captcha" placeholder="请输入验证码" class="captcha-input" />
             <div class="captcha-display" @click="generateCaptcha">
               <canvas ref="captchaCanvas" width="120" height="40"></canvas>
             </div>
           </div>
         </div>
-        
-        <el-button 
-          type="primary" 
-          class="login-button" 
-          @click="handleLogin"
-          :loading="loading"
-        >{{ loading ? '登录中...' : '登录' }}</el-button>
-        
+
+        <el-button type="primary" class="login-button" @click="handleLogin" :loading="loading">{{ loading ? '登录中...' :
+          '登录' }}</el-button>
+
         <div class="login-options">
           <span class="option-text" @click="goToForgotPassword">忘记密码？</span>
           <span class="divider">|</span>
@@ -87,7 +70,7 @@ export default {
         captcha += chars.charAt(Math.floor(Math.random() * chars.length))
       }
       this.captchaText = captcha
-      
+
       // Draw captcha on canvas
       this.$nextTick(() => {
         this.drawCaptcha()
@@ -98,11 +81,11 @@ export default {
       const ctx = canvas.getContext('2d')
       const width = canvas.width
       const height = canvas.height
-      
+
       // Clear canvas
       ctx.fillStyle = '#f0f0f0'
       ctx.fillRect(0, 0, width, height)
-      
+
       // Draw random dots
       for (let i = 0; i < 50; i++) {
         ctx.fillStyle = this.getRandomColor(0.5)
@@ -116,7 +99,7 @@ export default {
         )
         ctx.fill()
       }
-      
+
       // Draw random lines
       for (let i = 0; i < 5; i++) {
         ctx.strokeStyle = this.getRandomColor(0.5)
@@ -126,12 +109,12 @@ export default {
         ctx.lineWidth = 1
         ctx.stroke()
       }
-      
+
       // Draw captcha text
       ctx.font = 'bold 24px Arial'
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
-      
+
       // Draw each character with rotation and different colors
       for (let i = 0; i < this.captchaText.length; i++) {
         ctx.fillStyle = this.getRandomColor(1)
@@ -172,37 +155,33 @@ export default {
       if (!this.validateForm()) {
         return;
       }
-      
+
       this.loading = true;
       try {
         const response = await login(this.form.username, this.form.password);
         console.log('登录响应:', response);
-        
-        if (response && response.tokencontent) {
-          // 保存token到 localStorage
-          localStorage.setItem('token', response.tokencontent);
-          
-          // 构造基本用户信息并保存
-          const userInfo = {
-            username: this.form.username,
-            role: 1, // 默认为普通用户角色
-          };
-          localStorage.setItem('userInfo', JSON.stringify(userInfo));
-          
-          // 保存到 cookie
-          Cookies.set('Authorization', `Bearer ${response.tokencontent}`, { 
+
+        if (response && response.token) {
+          localStorage.setItem('token', response.token);
+          Cookies.set('Authorization', response.token, {
             expires: 1,
             path: '/',
             sameSite: 'Lax'
           });
-          
           this.$message.success('登录成功');
-          
-          // 直接跳转到作战态势分析页面
-          this.$router.replace('/battle-simulation');
+          this.$nextTick(() => {
+  // 防止重复跳转加 try-catch
+  try {
+    this.$router.replace(this.$route.query.redirect || '/battle-simulation');
+  } catch (err) {
+    console.warn('跳转失败:', err);
+  }
+});
+          console.log('当前路由实例:', this.$router)
         } else {
           throw new Error('登录失败：未收到有效的token');
         }
+
       } catch (error) {
         console.error('登录失败:', error);
         this.$message.error(error.message || '登录失败，请稍后重试');

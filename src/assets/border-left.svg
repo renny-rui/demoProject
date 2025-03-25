@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20" height="860" viewBox="0 0 20 860" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="sideGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1a3a6a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2a5ca0;stop-opacity:0.7" />
+    </linearGradient>
+  </defs>
+  <rect width="20" height="860" fill="url(#sideGradient)"/>
+  
+  <!-- Tech elements -->
+  <rect x="5" y="100" width="10" height="100" fill="#0c1c36" opacity="0.7"/>
+  <rect x="8" y="110" width="4" height="80" fill="#4a7cc0" opacity="0.8"/>
+  
+  <rect x="5" y="300" width="10" height="100" fill="#0c1c36" opacity="0.7"/>
+  <rect x="8" y="310" width="4" height="80" fill="#4a7cc0" opacity="0.8"/>
+  
+  <rect x="5" y="500" width="10" height="100" fill="#0c1c36" opacity="0.7"/>
+  <rect x="8" y="510" width="4" height="80" fill="#4a7cc0" opacity="0.8"/>
+  
+  <rect x="5" y="700" width="10" height="100" fill="#0c1c36" opacity="0.7"/>
+  <rect x="8" y="710" width="4" height="80" fill="#4a7cc0" opacity="0.8"/>
+  
+  <!-- Tech dots -->
+  <circle cx="10" cy="250" r="3" fill="#4a7cc0"/>
+  <circle cx="10" cy="450" r="3" fill="#4a7cc0"/>
+  <circle cx="10" cy="650" r="3" fill="#4a7cc0"/>
+</svg>

@@ -13,9 +13,14 @@ import BattleSimulation from '@/views/dashboard/BattleSimulation.vue'
 import DeviceBinding from '@/views/tasks/DeviceBinding.vue'
 import TaskAssignment from '@/views/tasks/TaskAssignment.vue'
 
+
 Vue.use(VueRouter)
 
 const routes = [
+  {
+    path: '/',
+    redirect: '/login'
+  },
   {
     path: '/login',
     name: 'Login',
@@ -43,6 +48,7 @@ const routes = [
       title: '忘记密码'
     }
   },
+  
   {
     path: '/dashboard',
     name: 'AdminDashboard',
@@ -140,10 +146,6 @@ const routes = [
         }
       }
     ]
-  },
-  {
-    path: '/',
-    redirect: '/battle-simulation'
   }
 ]
 
@@ -155,70 +157,47 @@ const router = new VueRouter({
 
 // 全局前置守卫
 router.beforeEach((to, from, next) => {
-  console.log('路由守卫检查 - 目标路由:', to.path);
-  
-  // 不需要登录权限的路由直接放行
-  if (to.matched.some(record => record.meta.requiresAuth === false)) {
-    // 如果已登录且要跳转登录页，则重定向到作战态势分析页面
-    if (to.path === '/login' && localStorage.getItem('token')) {
-      console.log('已登录，重定向到作战态势分析页面');
-      next('/battle-simulation');
-    } else {
-      next();
-    }
-    return;
-  }
-  
-  // 获取token和用户信息
+  console.log('[守卫] 路由跳转:', from.fullPath, '→', to.fullPath);
+
   const token = localStorage.getItem('token');
-  console.log('路由守卫检查 - token:', token);
-  
-  // 需要登录权限但没有token
-  if (!token) {
-    console.log('未登录，重定向到登录页');
-    next({
-      path: '/login',
-      query: { redirect: to.fullPath }
-    });
-    return;
+  const userInfoStr = localStorage.getItem('userInfo');
+
+  if (to.path === '/login' && token) {
+    console.log('[守卫] 已登录，跳转登录页，重定向到 /battle-simulation');
+    return next('/battle-simulation');
   }
-  
-  // 有token，检查用户信息
-  try {
-    const userInfoStr = localStorage.getItem('userInfo');
-    const userInfo = userInfoStr ? JSON.parse(userInfoStr) : null;
-    
-    if (!userInfo) {
-      console.log('没有用户信息，重定向到登录页');
-      localStorage.removeItem('token'); // 清除无效token
-      next({
-        path: '/login',
-        query: { redirect: to.fullPath }
-      });
-      return;
-    }
-    
-    // 检查用户角色是否有权限访问该路由
-    const userRole = userInfo.role;
-    console.log('用户角色:', userRole, '目标路由角色要求:', to.meta.roles);
-    
-    // 如果路由没有指定roles，或者用户角色在允许的roles中，则允许访问
-    if (!to.meta.roles || to.meta.roles.includes(userRole)) {
-      console.log('用户有权限访问该路由');
-      next();
-    } else {
-      console.log('用户无权限访问该路由，重定向到作战态势分析页面');
-      next('/battle-simulation');
-    }
-  } catch (error) {
-    console.error('解析用户信息失败:', error);
-    localStorage.removeItem('token');
-    localStorage.removeItem('userInfo');
-    next({
+
+  // 免登录页面
+  if (to.matched.some(record => record.meta.requiresAuth === false)) {
+    return next();
+  }
+
+  // 未登录
+  if (!token) {
+    console.log('[守卫] 未登录，跳转登录');
+    return next({
       path: '/login',
       query: { redirect: to.fullPath }
     });
+  }
+
+  // token 有，但 userInfo 还没写完
+  if (!userInfoStr) {
+    console.warn('[守卫] token 有但 userInfo 暂未写入，先进入当前页等待写入');
+    return next(); // ✅ 放行！否则页面会空白
+  }
+
+  const userInfo = JSON.parse(userInfoStr);
+  const userRole = userInfo.role;
+
+  if (!to.meta.roles || to.meta.roles.includes(userRole)) {
+    return next();
+  } else {
+    console.warn('[守卫] 无权限访问，跳默认页');
+    return next('/battle-simulation');
   }
 });
+
+
 
 export default router

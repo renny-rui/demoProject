@@ -44,8 +44,8 @@
           <i class="el-icon-s-order"></i>
           <span>任务分配</span>
         </template>
-        <el-menu-item index="/tasks/device-binding">设备/人员绑定</el-menu-item>
-        <el-menu-item index="/tasks/task-assignment">任务分配</el-menu-item>
+        <el-menu-item index="/tasks/device-binding">任务基本设置</el-menu-item>
+        <el-menu-item index="/tasks/task-assignment">小队任务分配</el-menu-item>
       </el-submenu>
 
       <!-- 作战态势分析 -->

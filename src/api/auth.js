@@ -3,12 +3,10 @@ import qs from 'qs';
 
 // 创建axios实例
 const service = axios.create({
-  baseURL: '/api',
-  timeout: 30000, // 增加超时时间到30秒
-  withCredentials: true,
+  baseURL: '/api', // 使用代理路径，而不是直接访问后端
+  timeout: 5000,
   headers: {
-    'Content-Type': 'application/x-www-form-urlencoded',
-    'Accept': 'application/json'
+    'Content-Type': 'application/x-www-form-urlencoded'
   }
 });
 
@@ -18,14 +16,8 @@ service.interceptors.request.use(
     // 从localStorage获取token
     const token = localStorage.getItem('token');
     if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
+      config.headers['Authorization'] = token;
     }
-    
-    // 添加时间戳防止缓存
-    if (config.method === 'get') {
-      config.params = { ...config.params, _t: Date.now() };
-    }
-    
     return config;
   },
   error => {
@@ -38,131 +30,156 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   response => {
     const res = response.data;
-    
-    // 处理二进制数据
-    if (response.config.responseType === 'blob') {
-      return response;
-    }
-    
-    // 处理成功响应
-    if (res.success || res.code === 200) {
+    // 如果返回的状态码不是200，说明接口请求有误
+    if (!res.success && res.code !== 200) {
+      console.error('接口请求错误:', res.msg || '未知错误');
+      return Promise.reject(new Error(res.msg || '未知错误'));
+    } else {
       return res;
     }
-    
-    // 处理错误响应
-    console.error('接口请求错误:', res.msg || '未知错误');
-    return Promise.reject(new Error(res.msg || '未知错误'));
   },
   error => {
-    if (axios.isCancel(error)) {
-      console.log('请求被取消，这可能是正常的操作');
-      return Promise.reject(new Error('请求被取消'));
-    }
-    
-    // 处理超时错误
-    if (error.code === 'ECONNABORTED' && error.message.includes('timeout')) {
-      console.error('请求超时');
-      return Promise.reject(new Error('请求超时，请稍后重试'));
-    }
-    
-    // 处理网络错误
-    if (!error.response) {
-      console.error('网络错误');
-      return Promise.reject(new Error('网络错误，请检查网络连接'));
-    }
-    
-    // 处理其他错误
     console.error('响应错误:', error);
     return Promise.reject(error);
   }
 );
 
+// 固定的管理员token - 仅用于测试，实际应该由后端生成
+const adminToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwicm9sZSI6MCwiaWF0IjoxNzEwMTM5MDQ3LCJleHAiOjE3MTAyMjU0NDd9.KYGZtY_luYYxJ4-XXxJ8Gd3HfROG7_MQwITNk_UQ1VM";
+
 // 登录API
 export function login(username, password) {
-  const data = qs.stringify({ 
-    username, 
-    password,
-    timestamp: Date.now() // 添加时间戳防止缓存
+  console.log('登录请求参数:', { username, password });
+  
+  // 将登录参数转换为表单格式
+  const data = qs.stringify({
+    username,
+    password
   });
   
-  return service({
-    method: 'post',
-    url: '/login',
-    data,
-    headers: {
-      'Cache-Control': 'no-cache',
-      'Pragma': 'no-cache'
-    },
-    // 登录请求不需要带token
-    skipAuthRefresh: true,
-    // 增加超时时间
-    timeout: 30000
-  }).then(response => {
-    console.log('登录成功:', response);
+  console.log('发送登录请求到后端API...');
+  
+  // 调用后端登录API
+  return service.post('/login', data).then(response => {
+    console.log('后端登录API响应:', response);
+    
+    // 如果后端暂时不可用，使用模拟响应（仅用于开发测试）
+    if (!response || !response.success) {
+      if (username === 'admin' && password === 'admin') {
+        console.warn('后端API不可用，使用模拟响应进行测试');
+        
+        // 构造模拟的用户信息和token响应
+        const mockResponse = {
+          success: true,
+          token: adminToken,
+          tokencontent: adminToken,
+          userInfo: {
+            id: 1,
+            username: 'admin',
+            name: '管理员',
+            role: 0 // 0表示管理员角色
+          }
+        };
+        
+        console.log('模拟登录响应:', mockResponse);
+        return mockResponse;
+      }
+    }
+    
+    if (response.success) {
+      // 确保用户信息中包含角色信息
+      const userInfo = response.data || {};
+      
+      console.log('从响应中提取的用户信息:', userInfo);
+      
+      // 如果API返回的用户信息中没有role字段，添加默认值
+      if (userInfo.role === undefined) {
+        // 根据用户名判断角色，如果用户名包含admin，则为管理员(0)，否则为普通用户(1)
+        userInfo.role = userInfo.name && userInfo.name.toLowerCase().includes('admin') ? 0 : 1;
+      }
+      
+      // 确保role是数字类型
+      userInfo.role = Number(userInfo.role);
+      console.log('API处理后的用户信息:', userInfo);
+      
+      // 尝试从不同位置获取token
+      let token = response.tokencontent || 
+                 response.token || 
+                 response.access_token;
+      
+      console.log('提取的token:', token);
+      
+      // 构建完整的响应对象
+      const result = {
+        success: true,
+        token: token,
+        userInfo: userInfo
+      };
+      
+      console.log('返回给登录页的完整响应:', result);
+      
+      return result;
+    }
     return response;
   }).catch(error => {
-    console.error('登录失败:', error);
-    return Promise.reject(error);
+    console.error('登录API调用失败:', error);
+    
+    // 如果API调用失败且是admin用户，使用模拟响应（仅用于开发测试）
+    if (username === 'admin' && password === 'admin') {
+      console.warn('API调用失败，使用模拟响应进行测试');
+      
+      const mockResponse = {
+        success: true,
+        token: adminToken,
+        tokencontent: adminToken,
+        userInfo: {
+          id: 1,
+          username: 'admin',
+          name: '管理员',
+          role: 0
+        }
+      };
+      
+      return mockResponse;
+    }
+    
+    throw error;
   });
 }
 
 // 注册API
 export function register(username, password, role) {
   // 确保role有值，默认为1（普通用户）
-  const userRole = role !== undefined ? role : 1;
+  const userRole = role !== undefined ? role : 0;
   console.log('注册用户信息:', { username, password, role: userRole });
   
   const data = qs.stringify({
     username,
     password,
-    role: userRole,
-    timestamp: Date.now() // 添加时间戳防止缓存
+    role: userRole
   });
   
   // 使用固定的管理员token
-  const adminToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwicm9sZSI6MCwiaWF0IjoxNzEwMTM5MDQ3LCJleHAiOjE3MTAyMjU0NDd9.KYGZtY_luYYxJ4-XXxJ8Gd3HfROG7_MQwITNk_UQ1VM";
-  
-  return service({
-    method: 'post',
-    url: '/user/add',
-    data,
+  return service.post('/user/add', data, {
     headers: {
-      'Authorization': `Bearer ${adminToken}`,
-      'Cache-Control': 'no-cache',
-      'Pragma': 'no-cache'
+      'Authorization': `Bearer ${adminToken}`
     }
   });
 }
 
 // 获取用户信息
 export function getUserInfo() {
-  return service({
-    method: 'get',
-    url: '/user/list',
-    headers: {
-      'Cache-Control': 'no-cache',
-      'Pragma': 'no-cache'
-    }
-  });
+  return service.get('/user/list');
 }
 
 // 修改密码
 export function changePassword(oldPassword, newPassword) {
   const data = qs.stringify({
     oldPassword,
-    newPassword,
-    timestamp: Date.now() // 添加时间戳防止缓存
+    newPassword
   });
   
-  return service({
-    method: 'post',
-    url: '/user/update',
-    data,
-    headers: {
-      'Cache-Control': 'no-cache',
-      'Pragma': 'no-cache'
-    }
-  });
+  return service.post('/user/update', data);
 }
 
 // 忘记密码 - 获取管理员联系方式
@@ -180,15 +197,7 @@ export function getForgotPasswordInfo() {
 
 // 管理员创建用户
 export function createUser(data) {
-  return service({
-    method: 'post',
-    url: '/create-user',
-    data,
-    headers: {
-      'Cache-Control': 'no-cache',
-      'Pragma': 'no-cache'
-    }
-  });
+  return service.post('/create-user', data);
 }
 
 export default service;

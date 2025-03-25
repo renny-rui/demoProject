@@ -5,7 +5,10 @@
       <video ref="videoPlayer" class="video-player" :src="require('@/assets/0001-0060.mp4')" autoplay muted playsinline
         @ended="onEnded"></video>
     </div>
-   
+  
+    <div class="top-border"></div>
+    <div class="between-side"></div>
+
     <!-- 战场信息展示区域 - 只显示3D模型，不显示卡片 -->
     <div v-if="!showVideo" class="battlefield-container">
       
@@ -15,8 +18,9 @@
       </div> -->
 
       <!-- Three.js容器 -->
+      
       <div ref="threeContainer" class="three-container">
-        <div class="full-screen-header"></div>
+        
       </div>
 
       <!-- 右侧悬浮菜单栏 -->
@@ -100,6 +104,11 @@
               <i class="el-icon-picture"></i>
               <span>任务发布</span>
             </div>
+            <div class="submenu" v-if="activeMenuItem === 'taskPublish'">
+              <div class="submenu-item" @click="navigateTo('/tasks/device-binding')">
+                <span>设备/人员绑定</span>
+              </div>
+            </div>
             <div class="menu-item" :class="{ 'active': activeMenuItem === 'taskManage' }"
               @click="handleMenuItemClick('taskManage')">
               <i class="el-icon-s-order"></i>
@@ -107,10 +116,10 @@
             </div>
             <div class="submenu" v-if="activeMenuItem === 'taskManage'">
               <div class="submenu-item" @click="navigateTo('/tasks/device-binding')">
-                <span>设备/人员绑定</span>
+                <span>任务基本设置</span>
               </div>
               <div class="submenu-item" @click="navigateTo('/tasks/task-assignment')">
-                <span>任务分配</span>
+                <span>小队任务分配</span>
               </div>
             </div>
           </div>
@@ -411,7 +420,7 @@ export default {
       // 获取容器尺寸
       this.containerWidth = container.clientWidth;
       this.containerHeight = container.clientHeight;
-      const topOffset = 90;
+      const topOffset = 110;
       // 创建正交相机
       const aspect = this.containerWidth / this.containerHeight;
       const zoom = 40;  // 视野范围的缩放因子，您可以根据需要进行调整
@@ -427,10 +436,10 @@ export default {
 
       this.camera = new THREE.OrthographicCamera(left, right, top, bottom, near, far);
 
-      // 设置相机位置
-      this.camera.position.set(0, 0, 50);  // 根据地形和场景调整位置
-      this.camera.rotation.set(0, Math.PI, 0);  // 使相机俯视地面（确保平行）
-      this.camera.lookAt(0, 0, 0);  // 确保相机指向地面
+      // 设置相机位置 - 正面视图
+      this.camera.position.set(0, 10, 10);  // 将相机位置设置为正面视图
+      this.camera.rotation.set(0, 0, 0);  // 将相机旋转设置为正面视图
+      this.camera.lookAt(0, 0, 0);  // 将相机指向原点
 
       // 创建渲染器
       this.renderer = new THREE.WebGLRenderer({
@@ -498,6 +507,9 @@ export default {
     loadAirplaneModel() {
       // 创建GLTF加载器
       const loader = new GLTFLoader();
+      
+      // 设置模型基础路径
+      loader.setPath('/models/');
 
       // 创建加载管理器来处理贴图路径
       const loadingManager = new THREE.LoadingManager();
@@ -1550,8 +1562,6 @@ export default {
   font-family: 'Arial', sans-serif;
 }
 
-
-
 .video-container {
   width: 100%;
   height: 100%;
@@ -1612,7 +1622,7 @@ export default {
   top: 50%;
   right: -1px;
   transform: translateY(-50%);
-  width: 300px;
+  width:260px;
   background-color: rgba(44, 52, 60, 0.9);
   border: 1px solid #3a4452;
   border-radius: 8px 0 0 8px;
@@ -1643,13 +1653,8 @@ export default {
   left: 5px;
   width: 20px;
   height: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  transform: translateY(-50%);
-  background-color: rgba(44, 52, 60, 0.9);
   border-radius: 50%;
+  background-color: rgba(44, 52, 60, 0.9);
   border: 1px solid #3a4452;
   z-index: 1002;
   transition: all 0.3s ease;
@@ -1869,6 +1874,22 @@ export default {
   border-radius: 0;
   box-shadow: none;
 }
+.top-border{
+  width: 100%;
+  height: 60px;
+  background: url('../../assets/top.png') no-repeat center;
+  background-size: 100% 60px;
+  background-color: #3a4452;
+}
+/* .between-side{
+  position: absolute;
+  left:8px;
+  height: 100%;
+  width:2px;
+  z-index: 10;
+  background: url('../../assets/bian.png') no-repeat center;
+  background-color: #3a4452;
+} */
 </style>
 
 <style>
@@ -1909,18 +1930,8 @@ export default {
   max-width: 100vw; /* 宽度自适应 */
   height: auto;     /* 高度按比例缩放 */
 }
-.full-screen-header {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-image: url('../../assets/header.png');
-  background-size: cover;
-  background-position: center;
-  z-index: 10; /* 放到最底层，避免遮挡Three.js */
-  pointer-events: none;
-  padding: 20px;
-}
 
 </style>
+
+
+
