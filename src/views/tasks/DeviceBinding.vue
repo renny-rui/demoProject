@@ -1,26 +1,25 @@
 <template>
   <div class="task-config">
 
-    <div class="page-header">
-      <div class="header-left">
-        <div class="back-button" @click="goBack">
-          <i class="el-icon-arrow-left"></i> 返回
-        </div>
-        <h2 class="page-title">任务基本设置</h2>
-      </div>
-    </div>
 
     <!-- 任务设置 -->
     <el-card class="box-card">
-
-      <el-divider content-position="left">
-        <h3>任务设置</h3>
-      </el-divider>
+      <div  style="width: 100%;
+    height: 46px; background-color: #CCD1D7;">
+        <div style="padding:1px 0">
+          <el-divider content-position="left">
+            <h3 style="background-color:#CCD1D7 ;">任务设置</h3>
+          </el-divider>
+        </div>
+       
+     
+      </div>
+     
       <el-form :model="taskForm.gameConfig" label-width="100px">
 
         <el-row :gutter="20">
 
-          <h4>基本设置：</h4>
+          <h4 style="color:#fff">基本设置：</h4>
           <el-col :span="8">
             <el-form-item label="最大人数">
               <el-input v-model="taskForm.gameConfig.baseSetting.maxPlayers" placeholder="请输入最大人数"></el-input>
@@ -39,65 +38,65 @@
         </el-row>
 
         <!-- 战场配置 -->
-        <h4>战场配置：</h4>
+        <h4 style="color:#fff">战场配置：</h4>
 
         <!-- 地形选择 -->
         <div class="map-selection">
-          <h5>地形选择</h5>
+          <h5 style="color:#fff">地形选择</h5>
           <div class="map-cards">
             <div class="map-card" :class="{ 'active': taskForm.gameConfig.warfareSetting.terrain === 'rainforest' }"
               @click="taskForm.gameConfig.warfareSetting.terrain = 'rainforest'">
-              <div class="map-image" :style="{ backgroundImage: 'url(' + require('../../assets/images1.jpg') + ')' }">
+              <div class="map-image" :style="{ backgroundImage: 'url(' + require('../../assets/taskPic/3.png') + ')' }">
               </div>
-              <div class="map-name">丛林</div>
+              <div class="map-name">雨林</div>
             </div>
             <div class="map-card" :class="{ 'active': taskForm.gameConfig.warfareSetting.terrain === 'beach' }"
               @click="taskForm.gameConfig.warfareSetting.terrain = 'beach'">
-              <div class="map-image" :style="{ backgroundImage: 'url(' + require('../../assets/images2.jpg') + ')' }">
+              <div class="map-image" :style="{ backgroundImage: 'url(' + require('../../assets/taskPic/2.png') + ')' }">
               </div>
               <div class="map-name">岸滩</div>
             </div>
             <div class="map-card" :class="{ 'active': taskForm.gameConfig.warfareSetting.terrain === 'ship' }"
               @click="taskForm.gameConfig.warfareSetting.terrain = 'ship'">
-              <div class="map-image" :style="{ backgroundImage: 'url(' + require('../../assets/images3.jpg') + ')' }">
+              <div class="map-image" :style="{ backgroundImage: 'url(' + require('../../assets/taskPic/1.png') + ')' }">
               </div>
-              <div class="map-name">海上</div>
+              <div class="map-name">乌舱</div>
             </div>
           </div>
         </div>
 
         <!-- 时间选择 -->
         <div class="time-selection">
-          <h5>时间选择</h5>
+          <h5 style="color:#fff">时间选择</h5>
           <div class="time-cards">
             <div class="time-card" :class="{ 'active': taskForm.gameConfig.warfareSetting.time === 'dawn' }"
               @click="taskForm.gameConfig.warfareSetting.time = 'dawn'">
-              <div class="time-image" style="background-color: #f08080;"></div>
+              <div class="time-image" :style="{ backgroundImage: 'url(' + require('../../assets/taskPic/9.png') + ')' }"></div>
               <div class="time-name">黎明</div>
             </div>
             <div class="time-card" :class="{ 'active': taskForm.gameConfig.warfareSetting.time === 'morning' }"
               @click="taskForm.gameConfig.warfareSetting.time = 'morning'">
-              <div class="time-image" style="background-color: #87ceeb;"></div>
+              <div class="time-image" :style="{ backgroundImage: 'url(' + require('../../assets/taskPic/6.png') + ')' }"></div>
               <div class="time-name">早晨</div>
             </div>
             <div class="time-card" :class="{ 'active': taskForm.gameConfig.warfareSetting.time === 'noon' }"
               @click="taskForm.gameConfig.warfareSetting.time = 'noon'">
-              <div class="time-image" style="background-color: #ffd700;"></div>
+              <div class="time-image" :style="{ backgroundImage: 'url(' + require('../../assets/taskPic/7.png') + ')' }"></div>
               <div class="time-name">正午</div>
             </div>
             <div class="time-card" :class="{ 'active': taskForm.gameConfig.warfareSetting.time === 'afternoon' }"
               @click="taskForm.gameConfig.warfareSetting.time = 'afternoon'">
-              <div class="time-image" style="background-color: #ffa500;"></div>
+              <div class="time-image" :style="{ backgroundImage: 'url(' + require('../../assets/taskPic/4.png') + ')' }"></div>
               <div class="time-name">下午</div>
             </div>
             <div class="time-card" :class="{ 'active': taskForm.gameConfig.warfareSetting.time === 'dusk' }"
               @click="taskForm.gameConfig.warfareSetting.time = 'dusk'">
-              <div class="time-image" style="background-color: #ff4500;"></div>
+              <div class="time-image" :style="{ backgroundImage: 'url(' + require('../../assets/taskPic/8.png') + ')' }"></div>
               <div class="time-name">黄昏</div>
             </div>
             <div class="time-card" :class="{ 'active': taskForm.gameConfig.warfareSetting.time === 'night' }"
               @click="taskForm.gameConfig.warfareSetting.time = 'night'">
-              <div class="time-image" style="background-color: #191970;"></div>
+              <div class="time-image" :style="{ backgroundImage: 'url(' + require('../../assets/taskPic/5.png') + ')' }"></div>
               <div class="time-name">夜间</div>
             </div>
           </div>
@@ -125,37 +124,44 @@
         </el-row>
 
         <!-- 天气配置 -->
-        <h4>天气配置：</h4>
-        <el-row>
-          <el-col :span="24">
-            <el-button type="primary" icon="el-icon-plus" @click="addWeather" style="margin-bottom: 15px;"
-              class="add-button">新增天气</el-button>
-          </el-col>
-        </el-row>
+        <div class="weather-config-section">
+          <h4 style="color:#fff">天气配置：</h4>
+          <!-- 新增天气按钮 -->
+           <div style="margin: 10px 0 15px 0; height: 30px;">
+           
+              <el-button type="primary" icon="el-icon-plus" @click="addWeather" class="add-weather" >新增天气</el-button>
+           
+           </div>
+          
+          <!-- 天气列表 -->
+          <div class="weather-list">
+            <el-row :gutter="20" v-for="(weather, index) in taskForm.gameConfig.warfareSetting.weather" :key="index">
+              <el-col :span="8">
+                <el-form-item :label="'天气类型 ' + (index + 1)">
+                  <el-select v-model="weather.type" placeholder="选择天气类型" style="width: 100%;">
+                    <el-option label="晴天" value="sunny"></el-option>
+                    <el-option label="雨天" value="rainy"></el-option>
+                    <el-option label="雾天" value="foggy"></el-option>
+                    <el-option label="雪天" value="snowy"></el-option>
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="8">
+                <el-form-item :label="'持续时间 ' + (index + 1)">
+                  <el-input v-model="weather.duration" placeholder="请输入持续时间（分钟）"></el-input>
+                </el-form-item>
+              </el-col>
+              <el-col :span="4">
+                <el-form-item label=" ">
+                  <el-button type="danger" icon="el-icon-delete" @click="removeWeather(index)" circle></el-button>
+                </el-form-item>
+              </el-col>
+            </el-row>
+          </div>
+          
+          
+        </div>
 
-        <el-row :gutter="20" v-for="(weather, index) in taskForm.gameConfig.warfareSetting.weather" :key="weather.index"
-          style="margin-bottom: 15px;">
-          <el-col :span="8">
-            <el-form-item :label="'天气类型 ' + (index + 1)">
-              <el-select v-model="weather.type" placeholder="选择天气类型">
-                <el-option label="晴天" value="sunny"></el-option>
-                <el-option label="雨天" value="rainy"></el-option>
-                <el-option label="雾天" value="foggy"></el-option>
-                <el-option label="雪天" value="snowy"></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item :label="'持续时间 ' + (index + 1)">
-              <el-input v-model="weather.duration" placeholder="请输入持续时间"></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="4">
-            <el-form-item label=" ">
-              <el-button type="danger" icon="el-icon-delete" @click="removeWeather(index)" circle></el-button>
-            </el-form-item>
-          </el-col>
-        </el-row>
         <el-form-item style="display: flex;justify-content: center;">
           <el-button type="primary" @click="submitForm" class="submit-button">下一步</el-button>
         </el-form-item>
@@ -177,34 +183,34 @@ export default {
       taskForm: {
         gameConfig: {
           baseSetting: {
-            maxPlayers: '',
-            maxDuration: '',
+            maxPlayers: 0,
+            maxDuration: 0,
             hostIP: ''
           },
           warfareSetting: {
             terrain: '',
             time: '',
             artilleryStrategy: {
-              averageInterval: '',
-              minRandomInterval: '',
-              maxRandomInterval: ''
+              averageInterval: 0,
+              minRandomInterval: 0,
+              maxRandomInterval: 0
             },
-            weather: [
-              {
-                index: 0,
-                type: '',
-                duration: ''
-              }
-            ]
+            weather: []
           }
         }
       }
     };
   },
+  created() {
+    // Initialize with one empty weather item
+    this.addWeather();
+  },
   methods: {
     addWeather() {
       const newIndex = this.taskForm.gameConfig.warfareSetting.weather.length;
+      // Use Vue.set to ensure reactivity
       this.taskForm.gameConfig.warfareSetting.weather.push({
+        id: Date.now(), // Add a unique ID for better tracking
         index: newIndex,
         type: '',
         duration: ''
@@ -221,8 +227,8 @@ export default {
       // Store form data in localStorage for access in TaskAssignment
       localStorage.setItem('taskFormData', JSON.stringify(this.taskForm));
       
-      // Navigate to the TaskAssignment page
-      this.$router.push('/tasks/task-assignment');
+      // Emit an event to show the task assignment dialog
+      this.$emit('next-step');
     },
     goBack() {
       this.$router.go(-1); // Navigate back to previous page
@@ -234,7 +240,27 @@ export default {
 <style scoped>
 .box-card {
   margin-bottom: 20px;
+  background-color: #383D44;
 }
+.el-card {
+    border-radius: 4px !important;
+    overflow: hidden !important;
+    color: #303133 !important;
+    transition: .3s !important;
+}
+
+/* 设置所有表单标签为白色 */
+::v-deep .el-form-item__label {
+  color: #fff !important;
+}
+
+/* 设置输入框的背景颜色 */
+::v-deep .el-input__inner {
+  background-color: #2e2e3a !important;
+  border-color: #383D44 !important;
+  color: #fff !important;
+}
+
 
 .add-button {
   background-color: #409EFF !important;
@@ -244,6 +270,8 @@ export default {
 .map-selection,
 .time-selection {
   margin-bottom: 20px;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 .map-cards,
@@ -251,6 +279,8 @@ export default {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 .map-card,
@@ -319,8 +349,14 @@ h5 {
 }
 
 .el-form-item__label {
-  font-size: 15px !important;
-  font-weight: 500 !important;
+    text-align: right !important;
+    vertical-align: middle !important;
+    float: left !important;
+    font-size: 14px !important;
+    color: black !important;
+    line-height: 40px !important;
+    padding: 0 12px 0 0 !important;
+    box-sizing: border-box !important;
 }
 
 .add-button {
@@ -328,7 +364,51 @@ h5 {
 }
 
 .submit-button {
-  background-color: #409EFF !important;
-  border-color: #409EFF !important;
+  background-color: #c1ffff !important;
+  border-color: #c1ffff !important;
+  color:#383D44 !important;
+}
+
+.task-title-bar {
+  background: url('../../assets/title.png') no-repeat;
+  background-size: 100% 100%;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  margin-bottom: 20px;
+}
+
+.task-title-text {
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  padding-left: 20px;
+}
+.task-config{
+  background-color: #383D44 !important;
+}
+.el-divider__text {
+    position: absolute !important;
+    background-color: #FFF !important;
+     padding: 0 !important; 
+    font-weight: 500 !important;
+    color: #303133 !important;
+}
+.el-card__body, .el-main {
+  padding: 0 !important;
+}
+
+.weather-config-section {
+  margin-bottom: 20px;
+}
+
+.weather-list {
+  margin-bottom: 20px;
+}
+.add-weather{
+  background-color: #c1ffff !important;
+  border-color: #c1ffff !important;
+  color:#383D44 !important
 }
 </style>

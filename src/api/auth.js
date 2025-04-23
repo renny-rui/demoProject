@@ -4,10 +4,8 @@ import qs from 'qs';
 // 创建axios实例
 const service = axios.create({
   baseURL: '/api', // 使用代理路径，而不是直接访问后端
-  timeout: 5000,
-  headers: {
-    'Content-Type': 'application/x-www-form-urlencoded'
-  }
+  timeout: 30000  // 增加超时时间从5秒到30秒
+  // 不在全局设置Content-Type，而是在各个请求中单独设置
 });
 
 // 请求拦截器
@@ -48,44 +46,25 @@ service.interceptors.response.use(
 const adminToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwicm9sZSI6MCwiaWF0IjoxNzEwMTM5MDQ3LCJleHAiOjE3MTAyMjU0NDd9.KYGZtY_luYYxJ4-XXxJ8Gd3HfROG7_MQwITNk_UQ1VM";
 
 // 登录API
-export function login(username, password) {
-  console.log('登录请求参数:', { username, password });
+export function login(UserName, PassWord ) {
+  console.log('登录请求参数:', { UserName, PassWord  });
   
   // 将登录参数转换为表单格式
-  const data = qs.stringify({
-    username,
-    password
+  const formData = qs.stringify({
+    UserName,
+    PassWord 
   });
   
   console.log('发送登录请求到后端API...');
   
-  // 调用后端登录API
-  return service.post('/login', data).then(response => {
-    console.log('后端登录API响应:', response);
-    
-    // 如果后端暂时不可用，使用模拟响应（仅用于开发测试）
-    if (!response || !response.success) {
-      if (username === 'admin' && password === 'admin') {
-        console.warn('后端API不可用，使用模拟响应进行测试');
-        
-        // 构造模拟的用户信息和token响应
-        const mockResponse = {
-          success: true,
-          token: adminToken,
-          tokencontent: adminToken,
-          userInfo: {
-            id: 1,
-            username: 'admin',
-            name: '管理员',
-            role: 0 // 0表示管理员角色
-          }
-        };
-        
-        console.log('模拟登录响应:', mockResponse);
-        return mockResponse;
-      }
+  // 调用后端登录API，使用表单格式
+  return service.post('/Login', formData, {
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
     }
-    
+  }).then(response => {
+    console.log('后端登录API响应:', response);
+
     if (response.success) {
       // 确保用户信息中包含角色信息
       const userInfo = response.data || {};
@@ -103,9 +82,7 @@ export function login(username, password) {
       console.log('API处理后的用户信息:', userInfo);
       
       // 尝试从不同位置获取token
-      let token = response.tokencontent || 
-                 response.token || 
-                 response.access_token;
+      let token = response.data.TokenContent
       
       console.log('提取的token:', token);
       
@@ -123,26 +100,6 @@ export function login(username, password) {
     return response;
   }).catch(error => {
     console.error('登录API调用失败:', error);
-    
-    // 如果API调用失败且是admin用户，使用模拟响应（仅用于开发测试）
-    if (username === 'admin' && password === 'admin') {
-      console.warn('API调用失败，使用模拟响应进行测试');
-      
-      const mockResponse = {
-        success: true,
-        token: adminToken,
-        tokencontent: adminToken,
-        userInfo: {
-          id: 1,
-          username: 'admin',
-          name: '管理员',
-          role: 0
-        }
-      };
-      
-      return mockResponse;
-    }
-    
     throw error;
   });
 }

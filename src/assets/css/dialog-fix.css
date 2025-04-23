@@ -1,0 +1,31 @@
+/* 修复Element UI对话框层级问题 */
+.el-dialog__wrapper {
+  position: fixed !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  overflow: auto !important;
+  z-index: 2050 !important; /* 高于默认的2000 */
+}
+
+.v-modal {
+  position: fixed !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  opacity: 0.5 !important;
+  background: #000 !important;
+  z-index: 2040 !important; /* 低于对话框但高于其他元素 */
+}
+
+.el-dialog {
+  position: relative !important;
+  margin: 15vh auto 50px !important;
+  background: #fff !important;
+  border-radius: 2px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+  box-sizing: border-box !important;
+  z-index: 2051 !important; /* 高于wrapper */
+}

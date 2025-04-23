@@ -13,6 +13,17 @@ import BattleSimulation from '@/views/dashboard/BattleSimulation.vue'
 import DeviceBinding from '@/views/tasks/DeviceBinding.vue'
 import TaskAssignment from '@/views/tasks/TaskAssignment.vue'
 
+// 导入管理页面组件
+import Equipment from '@/views/management/Equipment.vue'
+import DeviceCategory from '@/views/management/DeviceCategory.vue'
+import Grades from '@/views/management/Grades.vue'
+import Content from '@/views/management/Content.vue'
+import Courses from '@/views/management/Courses.vue'
+import Permission from '@/views/user/Permission.vue'
+
+// Clear any existing token to ensure login page is shown
+localStorage.removeItem('token');
+localStorage.removeItem('userInfo');
 
 Vue.use(VueRouter)
 
@@ -102,8 +113,18 @@ const routes = [
         component: Roles,
         meta: {
           requiresAuth: true,
+          title: '角色管理',
+          roles: [0,1] // 只有管理员可访问
+        }
+      },
+      {
+        path: 'Permission',
+        name: 'Permission',
+        component: Permission,
+        meta: {
+          requiresAuth: true,
           title: '权限管理',
-          roles: [0] // 只有管理员可访问
+          roles: [0,1] // 只有管理员可访问
         }
       },
       {
@@ -114,6 +135,85 @@ const routes = [
           requiresAuth: true,
           title: '操作日志',
           roles: [0] // 只有管理员可访问
+        }
+      }
+    ]
+  },
+  {
+    path: '/management',
+    component: MainLayout,
+    meta: {
+      requiresAuth: true
+    },
+    children: [
+      {
+        path: 'equipment',
+        name: 'Equipment',
+        component: Equipment,
+        meta: {
+          requiresAuth: true,
+          title: '设备管理',
+          roles: [0, 1] // 0-管理员, 1-普通用户
+        }
+      },
+      {
+        path: 'device-category',
+        name: 'DeviceCategory',
+        component: DeviceCategory,
+        meta: {
+          requiresAuth: true,
+          title: '设备分类管理',
+          roles: [0, 1] // 0-管理员, 1-普通用户
+        }
+      },
+      
+      {
+        path: 'grades',
+        name: 'Grades',
+        component: Grades,
+        meta: {
+          requiresAuth: true,
+          title: '成绩管理',
+          roles: [0, 1]
+        }
+      },
+      {
+        path: 'content',
+        name: 'Content',
+        component: Content,
+        meta: {
+          requiresAuth: true,
+          title: '内容管理',
+          roles: [0, 1]
+        }
+      },
+      {
+        path: 'courses',
+        name: 'Courses',
+        component: Courses,
+        meta: {
+          requiresAuth: true,
+          title: '课程管理',
+          roles: [0, 1]
+        }
+      }
+    ]
+  },
+  {
+    path: '/device',
+    component: MainLayout,
+    meta: {
+      requiresAuth: true
+    },
+    children: [
+      {
+        path: 'info',
+        name: 'DeviceInfo',
+        redirect: '/management/equipment',
+        meta: {
+          requiresAuth: true,
+          title: '设备信息',
+          roles: [0, 1]
         }
       }
     ]
@@ -162,13 +262,8 @@ router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token');
   const userInfoStr = localStorage.getItem('userInfo');
 
-  if (to.path === '/login' && token) {
-    console.log('[守卫] 已登录，跳转登录页，重定向到 /battle-simulation');
-    return next('/battle-simulation');
-  }
-
   // 免登录页面
-  if (to.matched.some(record => record.meta.requiresAuth === false)) {
+  if (to.path === '/login') {
     return next();
   }
 
@@ -176,15 +271,14 @@ router.beforeEach((to, from, next) => {
   if (!token) {
     console.log('[守卫] 未登录，跳转登录');
     return next({
-      path: '/login',
-      query: { redirect: to.fullPath }
+      path: '/login'
     });
   }
 
   // token 有，但 userInfo 还没写完
   if (!userInfoStr) {
     console.warn('[守卫] token 有但 userInfo 暂未写入，先进入当前页等待写入');
-    return next(); // ✅ 放行！否则页面会空白
+    return next(); // 放行！否则页面会空白
   }
 
   const userInfo = JSON.parse(userInfoStr);
@@ -194,10 +288,8 @@ router.beforeEach((to, from, next) => {
     return next();
   } else {
     console.warn('[守卫] 无权限访问，跳默认页');
-    return next('/battle-simulation');
+    return next('/login');
   }
 });
-
-
 
 export default router

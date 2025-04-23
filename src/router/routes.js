@@ -11,12 +11,12 @@ import ForgotPassword from "@/views/ForgotPassword.vue"; // 导入忘记密码�
 import BattleSimulation from "@/views/dashboard/BattleSimulation.vue"; // 导入战场模拟页面
 
 // 导入管理页面
-import Personnel from "@/views/management/Personnel.vue";
 import Equipment from "@/views/management/Equipment.vue";
 import Courses from "@/views/management/Courses.vue";
 import Grades from "@/views/management/Grades.vue";
 import Content from "@/views/management/Content.vue";
 import Tasks from "@/views/management/Tasks.vue";
+import Permission from "@/views/user/Permission.vue";
 
 Vue.use(Router);
 
@@ -67,6 +67,15 @@ export default new Router({
           name: "Roles",
           component: Roles,
           meta: { 
+            title: '角色管理',
+            requiresAdmin: true // 标记该路由需要管理员权限
+          }
+        },
+        {
+          path: "user/permission",
+          name: "Permission",
+          component: Permission,
+          meta: { 
             title: '权限管理',
             requiresAdmin: true // 标记该路由需要管理员权限
           }
@@ -80,11 +89,7 @@ export default new Router({
           }
         },
         // 管理页面路由
-        {
-          path: "management/personnel",
-          name: "Personnel",
-          component: Personnel
-        },
+
         {
           path: "management/equipment",
           name: "Equipment",

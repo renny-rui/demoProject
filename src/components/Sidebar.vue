@@ -36,6 +36,7 @@
           <span>设备管理</span>
         </template>
         <el-menu-item index="/device/info">设备信息</el-menu-item>
+        <el-menu-item index="/management/device-category">设备分类</el-menu-item>
       </el-submenu>
 
       <!-- 任务分配 -->
@@ -186,5 +187,24 @@ export default {
   color: #fff;
   font-weight: bold;
   font-size: 16px;
+}
+</style>
+
+<style>
+/* 修改二级菜单高亮样式 */
+.el-menu-item.is-active {
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.05)) !important;
+  color: #fff !important;
+}
+
+/* 修改二级菜单hover样式 */
+.el-menu-item:hover {
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05)) !important;
+}
+
+/* 确保文字颜色在高亮状态下仍然清晰可见 */
+.el-menu-item.is-active span,
+.el-menu-item.is-active i {
+  color: #fff !important;
 }
 </style>

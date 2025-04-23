@@ -1,0 +1,32 @@
+/* 日期选择器层级修复 */
+.el-picker-panel,
+.el-date-picker,
+.el-date-range-picker,
+.el-time-panel,
+.el-picker__popper,
+.el-select-dropdown,
+.el-dropdown-menu,
+.el-tooltip__popper {
+  z-index: 99999 !important;
+}
+
+/* 确保弹出层容器不被截断 */
+.el-dialog__wrapper {
+  overflow: visible !important;
+}
+
+/* 确保弹出层正确定位 */
+.el-popper {
+  position: absolute !important;
+  z-index: 99999 !important;
+}
+
+/* 确保日期选择器面板显示在最上层 */
+.el-date-table, 
+.el-year-table,
+.el-month-table,
+.el-time-spinner,
+.el-time-panel__content,
+.el-date-picker__header {
+  z-index: 99999 !important;
+}
