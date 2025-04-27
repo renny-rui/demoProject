@@ -150,7 +150,7 @@ export function getConfig(params) {
   formData.append('Num', params.Num);  // 使用大写的Num参数名
   
   return service({
-    url: '/Common/GetConfig',
+    url: '/Common/Config/List',
     method: 'post',
     data: formData,
     headers: {

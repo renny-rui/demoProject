@@ -39,7 +39,7 @@
           <div class="task-card" :class="{ 'active': selectedTaskType === 'oilDrumDelivery' }"
             @click="selectTaskType('oilDrumDelivery')">
             <div class="task-image" style="background-color: #7B8B9B; border-radius: 10px 10px 0 0;">
-              <img src="../../assets/icons/youliaojiazhu.png" style="width: 50px;height: 50px;">
+              <img src="../../assets/icons/777油料前送.png" >
               <!-- <i class="el-icon-goods" style="font-size: 40px;"></i> -->
             </div>
             <div class="task-name">油料前送</div>
@@ -48,35 +48,39 @@
             @click="selectTaskType('combatVehicleRefueling')">
             <div class="task-image" style="background-color: #7B8B9B; border-radius: 10px 10px 0 0;">
               <!-- <i class="el-icon-box" style="font-size: 40px;"></i> -->
-              <img src="../../assets/icons/youliaojiazhu.png" style="width: 50px;height: 50px;">
+              <img src="../../assets/icons/777油料加注.png" >
             </div>
             <div class="task-name">油料加注</div>
           </div>
           <div class="task-card" :class="{ 'active': selectedTaskType === 'hotMealPreparation' }"
             @click="selectTaskType('hotMealPreparation')">
             <div class="task-image" style="background-color: #7B8B9B; border-radius: 10px 10px 0 0;">
-              <i class="el-icon-dish" style="font-size: 40px;"></i>
+              <!-- <i class="el-icon-dish" style="font-size: 40px;"></i> -->
+              <img src="../../assets/icons/777热食制作1.png" >
             </div>
             <div class="task-name">热食制作</div>
           </div>
           <div class="task-card" :class="{ 'active': selectedTaskType === 'hotMealDelivery' }"
             @click="selectTaskType('hotMealDelivery')">
             <div class="task-image" style="background-color: #7B8B9B; border-radius: 10px 10px 0 0;">
-              <i class="el-icon-food" style="font-size: 40px;"></i>
+              <!-- <i class="el-icon-food" style="font-size: 40px;"></i> -->
+              <img src="../../assets/icons/777热食前送.png" >
             </div>
             <div class="task-name">热食前送</div>
           </div>
           <div class="task-card" :class="{ 'active': selectedTaskType === 'combatVehicleMaintenance' }"
             @click="selectTaskType('combatVehicleMaintenance')">
             <div class="task-image" style="background-color: #7B8B9B; border-radius: 10px 10px 0 0;">
-              <i class="el-icon-setting" style="font-size: 40px;"></i>
+              <!-- <i class="el-icon-setting" style="font-size: 40px;"></i> -->
+              <img src="../../assets/icons/777装备抢修.png" >
             </div>
             <div class="task-name">装备抢修</div>
           </div>
           <div class="task-card" :class="{ 'active': selectedTaskType === 'medicalEvacuation' }"
             @click="selectTaskType('medicalEvacuation')">
             <div class="task-image" style="background-color: #7B8B9B; border-radius: 10px 10px 0 0;">
-              <i class="el-icon-first-aid-kit" style="font-size: 40px;"></i>
+              <!-- <i class="el-icon-first-aid-kit" style="font-size: 40px;"></i> -->
+              <img src="../../assets/icons/777卫勤救护.png" >
             </div>
             <div class="task-name">卫勤救护</div>
           </div>
@@ -695,19 +699,70 @@ body > .el-select__popper.el-popper[role=tooltip] {
   border: 1px solid #ccc;
   border-radius: 10px;
   cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+
+
+.task-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #C1FFFF, transparent);
+  transform: translateX(-100%);
+  transition: transform 0.5s;
+}
+
+.task-card:hover::before {
+  transform: translateX(100%);
+}
+
+.task-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 20px rgba(193, 255, 255, 0.3);
+  border-color: #C1FFFF;
 }
 
 .task-card.active {
-  border-color: #c1ffff;
-  box-shadow: 0 0 10px rgba(64, 158, 255, 0.5);
+  border: 2px solid #C1FFFF;
+  box-shadow: 0 0 20px rgba(193, 255, 255, 0.3);
+  background: linear-gradient(180deg, #2C3E50 0%, #243342 100%);
 }
 
 .task-image {
-  height: 80px;
+  height: 90px;
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-bottom: 16px;
+  border-radius: 50%;
+  background: rgba(193, 255, 255, 0.1);
+  transition: all 0.3s ease;
 }
+
+.task-card:hover .task-image,
+.task-card.active .task-image {
+  background: rgba(193, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.task-image i {
+  font-size: 36px !important;
+  color: #C1FFFF;
+  transition: all 0.3s ease;
+}
+
+.task-card:hover .task-image i,
+.task-card.active .task-image i {
+  transform: scale(1.1);
+}
+
 
 .task-name {
   text-align: center;

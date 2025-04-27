@@ -19,6 +19,8 @@ import DeviceCategory from '@/views/management/DeviceCategory.vue'
 import Grades from '@/views/management/Grades.vue'
 import Content from '@/views/management/Content.vue'
 import Courses from '@/views/management/Courses.vue'
+import Rules from '@/views/management/Rules.vue'
+import MotionCapture from '@/views/management/MotionCapture.vue'
 import Permission from '@/views/user/Permission.vue'
 
 // Clear any existing token to ensure login page is shown
@@ -195,6 +197,26 @@ const routes = [
           requiresAuth: true,
           title: '课程管理',
           roles: [0, 1]
+        }
+      },
+      {
+        path: 'rules',
+        name: 'Rules',
+        component: Rules,
+        meta: {
+          requiresAuth: true,
+          title: '规则体系管理',
+          roles: [0]  // 只有管理员可访问
+        }
+      },
+      {
+        path: 'motion-capture',
+        name: 'MotionCapture',
+        component: MotionCapture,
+        meta: {
+          requiresAuth: true,
+          title: '动作捕捉与感应反馈',
+          roles: [0]  // 只有管理员可访问
         }
       }
     ]

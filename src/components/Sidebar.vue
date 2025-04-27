@@ -85,6 +85,18 @@
         <el-menu-item index="/teaching/category">示教分类</el-menu-item>
         <el-menu-item index="/teaching/publish">发布记录</el-menu-item>
       </el-submenu>
+
+      <!-- 规则体系管理 - 仅管理员可见 -->
+      <el-menu-item v-if="isAdmin" index="/management/rules">
+        <i class="el-icon-setting"></i>
+        <span>规则体系管理</span>
+      </el-menu-item>
+      
+      <!-- 动作捕捉与感应反馈 - 仅管理员可见 -->
+      <el-menu-item v-if="isAdmin" index="/management/motion-capture">
+        <i class="el-icon-video-camera"></i>
+        <span>动作捕捉与感应反馈</span>
+      </el-menu-item>
     </el-menu>
   </div>
 </template>

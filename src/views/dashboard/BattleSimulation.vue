@@ -89,7 +89,7 @@
 
             </div>
           </div>
-          <el-button type="primary" @click="startTask" class="detail-button">
+          <el-button type="primary" @click="taskDetail" class="detail-button">
             <i class="el-icon-s-operation">任务详情</i>
           </el-button>
         </template>
@@ -151,45 +151,44 @@
       <div class="floating-menu">
         <!-- 左侧一级菜单栏，仅展示图标，hover 只显示tooltip不展开二级菜单 -->
         <div class="menu-primary">
-              <el-tooltip v-for="item in primaryMenus" :key="item.key" :content="item.name" placement="right"
-                effect="dark">
-                <div class="menu-item" :class="{ active: activeMenuItem === item.key }"
-                  @click="handlePrimaryClick(item.key)">
-                  <img v-if="item.iconImage" :src="require(`../../assets/icons/${item.iconImage}`)" class="menu-icon-img"/>
-                  <i v-else :class="item.icon" class="menu-icon"></i>
-                </div>
-              </el-tooltip>
+          <el-tooltip v-for="item in primaryMenus" :key="item.key" :content="item.name" placement="right" effect="dark">
+            <div class="menu-item" :class="{ active: activeMenuItem === item.key }"
+              @click="handlePrimaryClick(item.key)">
+              <img v-if="item.iconImage" :src="require(`../../assets/icons/${item.iconImage}`)" class="menu-icon-img" />
+              <i v-else :class="item.icon" class="menu-icon"></i>
             </div>
+          </el-tooltip>
+        </div>
 
         <!-- 右侧二级菜单栏：只有点击一级菜单才显示，鼠标移走不会收起 -->
         <transition name="slide-fade">
-              <div class="menu-secondary" v-if="activeMenuItem && showSecondaryMenu">
-                <div class="submenu-title">{{ menuTitle }}</div>
-                <div class="submenu-item" v-for="sub in secondaryMenus[activeMenuItem]" :key="sub.key"
-                  :class="{ 'active-submenu': activeSubmenuItem === sub.key }" @click="handleSubmenuClick(sub.key)">
-                  {{ sub.name }}
-                </div>
-              </div>
-            </transition>
+          <div class="menu-secondary" v-if="activeMenuItem && showSecondaryMenu">
+            <div class="submenu-title">{{ menuTitle }}</div>
+            <div class="submenu-item" v-for="sub in secondaryMenus[activeMenuItem]" :key="sub.key"
+              :class="{ 'active-submenu': activeSubmenuItem === sub.key }" @click="handleSubmenuClick(sub.key)">
+              {{ sub.name }}
+            </div>
+          </div>
+        </transition>
         <!-- 右侧三级菜单栏：只有点击二级菜单才显示，鼠标移走不会收起 -->
         <transition name="slide-fade">
-              <div class="menu-tertiary" v-if="activeThirdMenuItem && tertiaryMenus[activeThirdMenuItem]">
-                <div class="submenu-title">
-                  {{
-                    activeThirdMenuItem
-                      ? secondaryMenus[activeMenuItem].find(
-                        (item) => item.key === activeThirdMenuItem
-                      )?.name
-                      : ''
-                  }}
-                </div>
-                <div class="submenu-item" v-for="item in tertiaryMenus[activeThirdMenuItem]" :key="item.key"
-                  :class="{ 'active-submenu': activeThirdMenuSelection === item.key }"
-                  @click="handleTertiaryClick(item.key)">
-                  {{ item.name }}
-                </div>
-              </div>
-            </transition>
+          <div class="menu-tertiary" v-if="activeThirdMenuItem && tertiaryMenus[activeThirdMenuItem]">
+            <div class="submenu-title">
+              {{
+                activeThirdMenuItem
+                  ? secondaryMenus[activeMenuItem].find(
+                    (item) => item.key === activeThirdMenuItem
+                  )?.name
+                  : ''
+              }}
+            </div>
+            <div class="submenu-item" v-for="item in tertiaryMenus[activeThirdMenuItem]" :key="item.key"
+              :class="{ 'active-submenu': activeThirdMenuSelection === item.key }"
+              @click="handleTertiaryClick(item.key)">
+              {{ item.name }}
+            </div>
+          </div>
+        </transition>
       </div>
 
 
@@ -223,18 +222,26 @@
         </el-dialog>
       </div>
     </transition>
-   
-    <el-dialog title="任务配置" :visible.sync="taskDialogVisible" width="70%"
-      :before-close="closeTaskDialog" custom-class="user-info-dialog" :append-to-body="true"
-      :destroy-on-close="true" :close-on-click-modal="false" :close-on-press-escape="true" :modal="false"
-      :show-close="false" :style="dialogStyle">
+
+    <el-dialog title="任务配置" :visible.sync="taskDialogVisible" width="70%" :before-close="closeTaskDialog"
+      custom-class="user-info-dialog" :append-to-body="true" :destroy-on-close="true" :close-on-click-modal="false"
+      :close-on-press-escape="true" :modal="false" :show-close="false" :style="dialogStyle">
       <div slot="title" class="custom-dialog-title">
         <span style="color: #fff;">任务配置</span>
         <el-button class="header-close-btn" size="small" @click="closeTaskDialog">关闭</el-button>
       </div>
-      <mixTask/>
+      <mixTask />
     </el-dialog>
 
+    <el-dialog title="任务详情" :visible.sync="taskDetailDialogVisible" width="70%" :before-close="closeTaskDialog"
+      custom-class="user-info-dialog" :append-to-body="true" :destroy-on-close="true" :close-on-click-modal="false"
+      :close-on-press-escape="true" :modal="false" :show-close="false" :style="dialogStyle">
+      <div slot="title" class="custom-dialog-title">
+        <span style="color: #fff;">任务详情</span>
+        <el-button class="header-close-btn" size="small" @click="closeTaskDialog">关闭</el-button>
+      </div>
+      <TaskDetail />
+    </el-dialog>
     <!-- 任务基本设置对话框 -->
     <el-dialog title="任务基本设置" :visible.sync="taskSettingsDialogVisible" width="70%"
       :before-close="closeTaskSettingsDialog" custom-class="user-info-dialog" :append-to-body="true"
@@ -291,16 +298,17 @@
       </div>
       <Organization />
     </el-dialog>
-    <el-dialog title="角色管理" :visible.sync="roleManagementDialogVisible" width="70%" :before-close="closeEquipmentDialog"
-      custom-class="user-info-dialog" :append-to-body="true" :destroy-on-close="true" :close-on-click-modal="false"
-      :close-on-press-escape="true" :modal="false" :show-close="false" :style="dialogStyle">
+    <el-dialog title="角色管理" :visible.sync="roleManagementDialogVisible" width="70%"
+      :before-close="closeRoleManagementDialog" custom-class="user-info-dialog" :append-to-body="true"
+      :destroy-on-close="true" :close-on-click-modal="false" :close-on-press-escape="true" :modal="false"
+      :show-close="false" :style="dialogStyle">
       <div slot="title" class="custom-dialog-title">
         <span style="color: #fff;">角色管理</span>
         <el-button class="header-close-btn" size="small" @click="roleManagementDialogVisible = false">关闭</el-button>
       </div>
-      <Roles/>
+      <Roles />
     </el-dialog>
-    <el-dialog title="权限管理" :visible.sync="permissionsDialogVisible" width="70%" :before-close="closeEquipmentDialog"
+    <el-dialog title="权限管理" :visible.sync="permissionsDialogVisible" width="70%" :before-close="closePermissionsDialog"
       custom-class="user-info-dialog" :append-to-body="true" :destroy-on-close="true" :close-on-click-modal="false"
       :close-on-press-escape="true" :modal="false" :show-close="false" :style="dialogStyle">
       <div slot="title" class="custom-dialog-title">
@@ -316,7 +324,7 @@
         <span style="color: #fff;">油料作业</span>
         <el-button class="header-close-btn" size="small" @click="fuelDialogVisible = false">关闭</el-button>
       </div>
-      <OilDelivery/>
+      <OilDelivery />
     </el-dialog>
     <el-dialog title="补给勤务" :visible.sync="supplyDialogVisible" width="70%" :before-close="closeEquipmentDialog"
       custom-class="user-info-dialog" :append-to-body="true" :destroy-on-close="true" :close-on-click-modal="false"
@@ -364,6 +372,7 @@
         <span style="color: #fff;">成绩管理</span>
         <el-button class="header-close-btn" size="small" @click="gradeManagementDialogVisible = false">关闭</el-button>
       </div>
+      <GradesManagement />
     </el-dialog>
     <el-dialog title="示教内容管理" :visible.sync="teachingContentDialogVisible" width="70%"
       :before-close="closeTeachingContentDialog" custom-class="user-info-dialog" :append-to-body="true"
@@ -382,6 +391,7 @@
         <span style="color: #fff;">规则体系管理</span>
         <el-button class="header-close-btn" size="small" @click="rulesSystemDialogVisible = false">关闭</el-button>
       </div>
+      <RulesManagement />
     </el-dialog>
     <el-dialog title="日志管理" :visible.sync="logManagementDialogVisible" width="70%"
       :before-close="closeLogManagementDialog" custom-class="user-info-dialog" :append-to-body="true"
@@ -391,6 +401,7 @@
         <span style="color: #fff;">日志管理</span>
         <el-button class="header-close-btn" size="small" @click="logManagementDialogVisible = false">关闭</el-button>
       </div>
+      <LogManagement />
     </el-dialog>
     <el-dialog title="科目设置与选择" :visible.sync="subjectSettingsDialogVisible" width="70%"
       :before-close="closeSubjectSettingsDialog" custom-class="user-info-dialog" :append-to-body="true"
@@ -427,6 +438,7 @@
         <span style="color: #fff;">动作捕捉与感应反馈</span>
         <el-button class="header-close-btn" size="small" @click="motionCaptureDialogVisible = false">关闭</el-button>
       </div>
+      <MotionCapture />
     </el-dialog>
     <el-dialog title="伴随指导" :visible.sync="guidanceDialogVisible" width="70%" :before-close="closeGuidanceDialog"
       custom-class="user-info-dialog" :append-to-body="true" :destroy-on-close="true" :close-on-click-modal="false"
@@ -435,6 +447,7 @@
         <span style="color: #fff;">伴随指导</span>
         <el-button class="header-close-btn" size="small" @click="guidanceDialogVisible = false">关闭</el-button>
       </div>
+      <GuidanceSystem />
     </el-dialog>
     <el-dialog title="智能指导" :visible.sync="intelligentGuidanceDialogVisible" width="70%"
       :before-close="closeIntelligentGuidanceDialog" custom-class="user-info-dialog" :append-to-body="true"
@@ -445,6 +458,7 @@
         <el-button class="header-close-btn" size="small"
           @click="intelligentGuidanceDialogVisible = false">关闭</el-button>
       </div>
+      <IntelligentGuidance />
     </el-dialog>
     <el-dialog title="训练数据采集与存储" :visible.sync="trainingDataDialogVisible" width="70%"
       :before-close="closeTrainingDataDialog" custom-class="user-info-dialog" :append-to-body="true"
@@ -454,6 +468,7 @@
         <span style="color: #fff;">训练数据采集与存储</span>
         <el-button class="header-close-btn" size="small" @click="trainingDataDialogVisible = false">关闭</el-button>
       </div>
+      <TrainingDataCollection />
     </el-dialog>
     <el-dialog title="智能辅助认知算法管理" :visible.sync="algorithmManagementDialogVisible" width="70%"
       :before-close="closeAlgorithmManagementDialog" custom-class="user-info-dialog" :append-to-body="true"
@@ -464,15 +479,17 @@
         <el-button class="header-close-btn" size="small"
           @click="algorithmManagementDialogVisible = false">关闭</el-button>
       </div>
+      <AlgorithmManagement />
     </el-dialog>
     <el-dialog title="考核评估配置" :visible.sync="assessmentConfigDialogVisible" width="70%"
       :before-close="closeAssessmentConfigDialog" custom-class="user-info-dialog" :append-to-body="true"
-      :destroy-on-close="true" :close-on-click-modal="false" :close-on-press-escape="true" :modal="false"
-      :show-close="false" :style="dialogStyle">
+      :destroy-on-close="false" :close-on-click-modal="false" :close-on-press-escape="true" :modal="false"
+      :show-close="false" :style="dialogStyle" @open="handleAssessmentConfigOpen">
       <div slot="title" class="custom-dialog-title">
         <span style="color: #fff;">考核评估配置</span>
         <el-button class="header-close-btn" size="small" @click="assessmentConfigDialogVisible = false">关闭</el-button>
       </div>
+      <AssessmentConfig ref="assessmentConfig" />
     </el-dialog>
     <el-dialog title="考核成绩及评价" :visible.sync="assessmentResultDialogVisible" width="70%"
       :before-close="closeAssessmentResultDialog" custom-class="user-info-dialog" :append-to-body="true"
@@ -510,6 +527,7 @@
         <span style="color: #fff;">考核评估指标管理</span>
         <el-button class="header-close-btn" size="small" @click="assessmentIndexDialogVisible = false">关闭</el-button>
       </div>
+      <AssessmentIndex ref="assessmentIndex" />
     </el-dialog>
     <el-dialog title="考核评估算法管理" :visible.sync="assessmentAlgorithmDialogVisible" width="70%"
       :before-close="closeAssessmentAlgorithmDialog" custom-class="user-info-dialog" :append-to-body="true"
@@ -520,6 +538,7 @@
         <el-button class="header-close-btn" size="small"
           @click="assessmentAlgorithmDialogVisible = false">关闭</el-button>
       </div>
+      <AssessmentAlgorithm ref="assessmentAlgorithm" />
     </el-dialog>
   </div>
 </template>
@@ -546,6 +565,18 @@ import SupplyService from '../training/SupplyService.vue';
 import SanitationService from '../training/SanitationService.vue';
 import EquipmentRepair from '../training/EquipmentRepair.vue';
 import CourseManagement from '../training/CourseManagement.vue';
+import GradesManagement from '../management/Grades.vue';
+import RulesManagement from '../management/Rules.vue';
+import MotionCapture from '../management/MotionCapture.vue'
+import GuidanceSystem from '../management/GuidanceSystem.vue'
+import IntelligentGuidance from '../management/IntelligentGuidance.vue'
+import TrainingDataCollection from '../management/TrainingDataCollection.vue'
+import AlgorithmManagement from '../management/AlgorithmManagement.vue'
+import AssessmentConfig from '../management/AssessmentConfig.vue'
+import AssessmentIndex from '../management/AssessmentIndex.vue'
+import AssessmentAlgorithm from '../management/AssessmentAlgorithm.vue'
+import LogManagement from '../management/LogManagement.vue'
+import TaskDetail from '../tasks/TaskDetail.vue'
 export default {
   name: 'BattleSimulation',
   components: {
@@ -562,7 +593,19 @@ export default {
     SupplyService,
     SanitationService,
     EquipmentRepair,
-    CourseManagement
+    CourseManagement,
+    GradesManagement,
+    RulesManagement,
+    MotionCapture,
+    GuidanceSystem,
+    IntelligentGuidance,
+    TrainingDataCollection,
+    AlgorithmManagement,
+    AssessmentConfig,
+    AssessmentIndex,
+    AssessmentAlgorithm,
+    LogManagement,
+    TaskDetail
   },
   data() {
     return {
@@ -667,6 +710,7 @@ export default {
       assessmentIndexDialogVisible: false, // 考核评估指标管理弹窗可见性
       assessmentAlgorithmDialogVisible: false, // 考核评估算法管理弹窗可见性
       isClosingDialog: false, // 标记对话框是否正在关闭中
+      taskDetailDialogVisible:false,
 
       // 视频相关
       showHelpPanel: false,
@@ -696,7 +740,7 @@ export default {
 
       // 任务基本设置对话框
       taskSettingsDialogVisible: false,
-      taskDialogVisible:false,
+      taskDialogVisible: false,
       taskSettings: {
         name: '',
         description: '',
@@ -825,14 +869,14 @@ export default {
     // 移除容器点击事件监听器
     document.removeEventListener('click', this.handleContainerClick);
 
- 
+
     // 清除计时器
     clearInterval(this.timerInterval);
   },
   methods: {
-   
+
     // 切换菜单折叠状态
-  
+
     handlePrimaryClick(key) {
       if (this.activeMenuItem === key) {
         // 如果点击的是当前激活的菜单项，则关闭它
@@ -1059,7 +1103,7 @@ export default {
       // 检查点击是否在菜单区域外
       const floatingMenu = document.querySelector('.floating-menu');
       const dialogs = document.querySelectorAll('.el-dialog');
-      
+
       // 检查点击是否在任何弹窗内
       let isClickInDialog = false;
       dialogs.forEach(dialog => {
@@ -1067,7 +1111,7 @@ export default {
           isClickInDialog = true;
         }
       });
-      
+
       // 如果点击在菜单区域外且不在任何弹窗内，则收起菜单
       if (floatingMenu && !floatingMenu.contains(event.target) && !isClickInDialog) {
         // 收起所有菜单
@@ -1459,7 +1503,7 @@ export default {
       this.elapsedTime = 0;
     },
 
-   
+
     handleVideoEnded() {
       console.log('视频播放结束');
       this.$refs.frameVideo.play();
@@ -1488,8 +1532,8 @@ export default {
     closeTaskSettingsDialog() {
       this.taskSettingsDialogVisible = false;
     },
-    closeTaskDialog(){
-       this.taskDialogVisible = false;
+    closeTaskDialog() {
+      this.taskDialogVisible = false;
     },
     showTaskAssignmentDialog() {
       this.taskSettingsDialogVisible = false;
@@ -1504,19 +1548,115 @@ export default {
     closeEquipmentDialog() {
       this.equipmentDialogVisible = false
     },
+    closeRoleManagementDialog() {
+      this.roleManagementDialogVisible = false;
+    },
     showDeviceCategoryDialog() {
       this.deviceCategoryDialogVisible = true
     },
     closeDeviceCategoryDialog() {
-      this.deviceCategoryDialogVisible = false
+      this.deviceCategoryDialogVisible = false;
     },
-    showMixTaskDialog(){
+    closeOrganizationDialog() {
+      this.organizationDialogVisible = false;
+    },
+    closeCourseManagementDialog() {
+      this.courseManagementDialogVisible = false;
+    },
+    closeGradeManagementDialog() {
+      this.gradeManagementDialogVisible = false;
+    },
+    closeTeachingContentDialog() {
+      this.teachingContentDialogVisible = false;
+    },
+    closeRulesSystemDialog() {
+      this.rulesSystemDialogVisible = false;
+    },
+    closeLogManagementDialog() {
+      this.logManagementDialogVisible = false;
+    },
+    closeSubjectSettingsDialog() {
+      this.subjectSettingsDialogVisible = false;
+    },
+    closeSceneOperationDialog() {
+      this.sceneOperationDialogVisible = false;
+    },
+    closeTaskGroupingDialog() {
+      this.taskGroupingDialogVisible = false;
+    },
+    closeMotionCaptureDialog() {
+      this.motionCaptureDialogVisible = false;
+    },
+    closeGuidanceDialog() {
+      this.guidanceSystemDialogVisible = false;
+    },
+    closeIntelligentGuidanceDialog() {
+      this.intelligentGuidanceDialogVisible = false;
+    },
+    closeTrainingDataDialog() {
+      this.trainingDataDialogVisible = false;
+    },
+    closeAlgorithmManagementDialog() {
+      this.algorithmManagementDialogVisible = false;
+    },
+    closeAssessmentConfigDialog() {
+      this.assessmentConfigDialogVisible = false;
+    },
+    closeAssessmentResultDialog() {
+      this.assessmentResultDialogVisible = false;
+    },
+    closeAssessmentReplayDialog() {
+      this.assessmentReplayDialogVisible = false;
+    },
+    closeIntelligentAnalysisDialog() {
+      this.intelligentAnalysisDialogVisible = false;
+    },
+    closeAssessmentIndexDialog() {
+      this.assessmentIndexDialogVisible = false;
+    },
+    closeAssessmentAlgorithmDialog() {
+      this.assessmentAlgorithmDialogVisible = false;
+    },
+    closePermissionsDialog() {
+      this.permissionsDialogVisible = false;
+    },
+    // 处理考核评估配置对话框打开事件
+    handleAssessmentConfigOpen() {
+      console.log('考核评估配置对话框已打开，刷新数据');
+      // 如果引用存在，调用组件的fetchSettings方法刷新数据
+      if (this.$refs.assessmentConfig) {
+        this.$refs.assessmentConfig.fetchSettings();
+      }
+    },
+
+    // 处理考核评估指标管理对话框打开事件
+    handleAssessmentIndexOpen() {
+      console.log('考核评估指标管理对话框已打开，刷新数据');
+      // 如果引用存在，调用组件的fetchSettings方法刷新数据
+      if (this.$refs.assessmentIndex) {
+        this.$refs.assessmentIndex.fetchSettings();
+      }
+    },
+
+    // 处理考核评估算法管理对话框打开事件
+    handleAssessmentAlgorithmOpen() {
+      console.log('考核评估算法管理对话框已打开，刷新数据');
+      // 如果引用存在，调用组件的fetchSettings方法刷新数据
+      if (this.$refs.assessmentAlgorithm) {
+        this.$refs.assessmentAlgorithm.fetchSettings();
+      }
+    },
+    showMixTaskDialog() {
       this.taskDialogVisible = true
     },
     //新增发布任务
     startTask() {
       // this.showTaskSettingsDialog();
       this.showMixTaskDialog();
+    },
+    taskDetail(){
+      this.taskDetailDialogVisible = true
+
     },
     //获取任务列表
     getLastList() {
@@ -2138,7 +2278,8 @@ export default {
   color: #fff;
   font-family: 'SourceHanSerifSC', serif;
 }
-.task-title{
+
+.task-title {
   font-family: 'SourceHanSerifSC', serif;
 }
 </style>
@@ -2319,7 +2460,7 @@ export default {
   height: 720px;
   width: 1280px;
   background-color: #383D44;
-  border:2px solid #c1ffff;
+  border: 2px solid #c1ffff;
   border-radius: 4px !important;
   /* Move dialog to the left by adding margin on the right */
   /* margin-top: 5vh; */

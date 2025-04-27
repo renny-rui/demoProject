@@ -131,3 +131,27 @@ export function deleteUser(userId) {
     return response;
   });
 }
+export function getLogList(params){
+  const token = getCookie('Authorization'); // 从 Cookie 获取 Token
+
+  if (!token) {
+    console.error("未找到 Token，用户可能未登录");
+    return Promise.reject("未找到 Token，用户可能未登录");
+  }
+
+  console.log('调用日志列表接口，参数:', params);
+  console.log('当前 Token:', token);
+
+  return service.post('/Log/List', params, {
+    headers: {
+      'Authorization': token // 确保正确传递 Token
+    },
+    withCredentials: true // 确保跨域请求携带 Cookie
+  }).then(response => {
+    console.log('日志列表接口响应:', response);
+    return response;
+  }).catch(error => {
+    console.error('获取日志列表失败:', error);
+    return Promise.reject(error);
+  });
+}
