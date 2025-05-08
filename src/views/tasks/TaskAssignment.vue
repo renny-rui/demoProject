@@ -601,7 +601,7 @@ body > .el-select__popper.el-popper[role=tooltip] {
 <style scoped>
 .box-card {
   background-color: #383D44;
-  border: 1px solid #383D44;
+  border: 1px solid #383D44 !important;
 }
 
 .el-select .el-input__inner {

@@ -22,6 +22,8 @@ import Courses from '@/views/management/Courses.vue'
 import Rules from '@/views/management/Rules.vue'
 import MotionCapture from '@/views/management/MotionCapture.vue'
 import Permission from '@/views/user/Permission.vue'
+import AssessmentResults from '@/views/management/AssessmentResults.vue'
+import AssessmentReplay from '@/views/management/AssessmentReplay.vue'
 
 // Clear any existing token to ensure login page is shown
 localStorage.removeItem('token');
@@ -196,6 +198,26 @@ const routes = [
         meta: {
           requiresAuth: true,
           title: '课程管理',
+          roles: [0, 1]
+        }
+      },
+      {
+        path: 'assessment-results',
+        name: 'AssessmentResults',
+        component: AssessmentResults,
+        meta: {
+          requiresAuth: true,
+          title: '考核成绩及评价',
+          roles: [0, 1]
+        }
+      },
+      {
+        path: 'assessment-replay',
+        name: 'AssessmentReplay',
+        component: AssessmentReplay,
+        meta: {
+          requiresAuth: true,
+          title: '实操考核过程回放',
           roles: [0, 1]
         }
       },

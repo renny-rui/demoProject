@@ -73,6 +73,8 @@
           <span>成绩管理</span>
         </template>
         <el-menu-item index="/score/statistics">成绩统计</el-menu-item>
+        <el-menu-item index="/management/assessment-results">考核成绩及评价</el-menu-item>
+        <el-menu-item index="/management/assessment-replay">实操考核过程回放</el-menu-item>
       </el-submenu>
 
       <!-- 示教内容管理 -->

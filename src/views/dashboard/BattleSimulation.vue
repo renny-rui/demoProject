@@ -24,30 +24,25 @@
       <!-- Three.js容器 -->
       <div ref="threeContainer" class="three-container">
       </div>
-      <div class="right-top">
+      <!-- <div class="right-top">
         <div class="frame-box">
 
           <div class="frame-content">
 
-            <!-- <img src="../../assets/mapPic.png" alt="task1" style="width: 100%;height: 130%; object-fit: cover;"> -->
             <img src="../../assets/snow.gif" alt="task1" style="width: 100%;height: 130%; object-fit: cover;">
           </div>
         </div>
         <div class="frame-box">
           <div class="frame-content" style="margin-top: 14px; height: 172px;">
-            <!-- <video ref="frameVideo" class="frame-video" autoplay muted playsinline loop preload="auto" :src="videoSrc"
-              style="width: 100%; height: 100%; object-fit: cover;" /> -->
             <img src="../../assets/mapPic1.png" alt="task2" style="width: 100%;height: 100%; object-fit: cover;">
           </div>
         </div>
         <div class="frame-box">
-          <!-- <div class="frame-top">
-          </div> -->
           <div class="frame-content">
             <img src="../../assets/mapPic2.png" alt="task3" style="width: 100%;height: 130%; object-fit: cover;">
           </div>
         </div>
-      </div>
+      </div> -->
       <!-- <div class="middle-top">
         <div class="middle-content">
           <img src="@/assets/map.png" alt="Map" style="width: 100%; height: 100%; object-fit: contain;">
@@ -66,7 +61,7 @@
         </div>
       </div> -->
 
-      <div class="left-top">
+      <div class="right-top">
         <template v-if="hasMissionGroups">
           <div class="frame-box" style="padding-top: 1px;">
             <div class="frame-top">
@@ -92,21 +87,24 @@
           <el-button type="primary" @click="taskDetail" class="detail-button">
             <i class="el-icon-s-operation">任务详情</i>
           </el-button>
+          <div class="frame-box" style="margin-top: 60px;">
+            <div class="frame-content">
+              <img src="../../assets/taskPic/3.png" alt="task1" style="width: 100%;height: 130%; object-fit: cover;">
+            </div>
+          </div>
+          <div class="frame-box" style="margin-top: 40px;">
+            <div class="frame-content">
+              <img src="../../assets/snow.gif" alt="task1" style="width: 100%;height: 130%; object-fit: cover;">
+            </div>
+          </div>
         </template>
         <template v-else>
           <div class="frame-box" style="padding-top: 1px;">
             <div class="frame-top">
-              <!-- <h4>未开始</h4> -->
               <h4 class="task-title">任务行动</h4>
             </div>
             <div class="frame-content" style="display: flex;flex-direction: column;">
               <span style="color: #C1FFFF;">【请发布新任务】</span>
-
-              <!-- <div style="color: #C1FFFF;font-size: 16px;">【抢滩登陆】</div>
-              <div style="color: #fff;font-size: 15px; margin-left: 10px;">油料小组4人</div>
-              <div style="color: #fff;font-size: 15px;margin-left: 10px;">给养小组4人</div>
-              <div style="color: #fff;font-size: 15px;margin-left: 10px;">卫勤小组4人</div>
-              <div style="color: #fff;font-size: 15px;margin-left: 10px;">维修小组4人</div> -->
 
             </div>
           </div>
@@ -114,7 +112,6 @@
             <i class="el-icon-circle-plus-outline">发布任务</i>
           </el-button>
         </template>
-
       </div>
 
       <!-- 底部卡片区域 -->
@@ -230,7 +227,7 @@
         <span style="color: #fff;">任务配置</span>
         <el-button class="header-close-btn" size="small" @click="closeTaskDialog">关闭</el-button>
       </div>
-      <mixTask />
+      <mixTask @submit-success="getLastList" />
     </el-dialog>
 
     <el-dialog title="任务详情" :visible.sync="taskDetailDialogVisible" width="70%" :before-close="closeTaskDialog"
@@ -240,7 +237,7 @@
         <span style="color: #fff;">任务详情</span>
         <el-button class="header-close-btn" size="small" @click="closeTaskDialog">关闭</el-button>
       </div>
-      <TaskDetail />
+      <TaskDetail @task-completed="getLastList" />
     </el-dialog>
     <!-- 任务基本设置对话框 -->
     <el-dialog title="任务基本设置" :visible.sync="taskSettingsDialogVisible" width="70%"
@@ -382,6 +379,7 @@
         <span style="color: #fff;">示教内容管理</span>
         <el-button class="header-close-btn" size="small" @click="teachingContentDialogVisible = false">关闭</el-button>
       </div>
+      <ContentManagement />
     </el-dialog>
     <el-dialog title="规则体系管理" :visible.sync="rulesSystemDialogVisible" width="70%"
       :before-close="closeRulesSystemDialog" custom-class="user-info-dialog" :append-to-body="true"
@@ -420,6 +418,7 @@
         <span style="color: #fff;">场景实操</span>
         <el-button class="header-close-btn" size="small" @click="sceneOperationDialogVisible = false">关闭</el-button>
       </div>
+      <ScenePractical/>
     </el-dialog>
     <el-dialog title="任务编组" :visible.sync="taskGroupingDialogVisible" width="70%"
       :before-close="closeTaskGroupingDialog" custom-class="user-info-dialog" :append-to-body="true"
@@ -499,6 +498,7 @@
         <span style="color: #fff;">考核成绩及评价</span>
         <el-button class="header-close-btn" size="small" @click="assessmentResultDialogVisible = false">关闭</el-button>
       </div>
+      <AssessmentResults/>
     </el-dialog>
     <el-dialog title="实操考核过程回放" :visible.sync="assessmentReplayDialogVisible" width="70%"
       :before-close="closeAssessmentReplayDialog" custom-class="user-info-dialog" :append-to-body="true"
@@ -508,6 +508,7 @@
         <span style="color: #fff;">实操考核过程回放</span>
         <el-button class="header-close-btn" size="small" @click="assessmentReplayDialogVisible = false">关闭</el-button>
       </div>
+      <AssessmentReplay />
     </el-dialog>
     <el-dialog title="智能系统分析及展示" :visible.sync="intelligentAnalysisDialogVisible" width="70%"
       :before-close="closeIntelligentAnalysisDialog" custom-class="user-info-dialog" :append-to-body="true"
@@ -539,6 +540,49 @@
           @click="assessmentAlgorithmDialogVisible = false">关闭</el-button>
       </div>
       <AssessmentAlgorithm ref="assessmentAlgorithm" />
+    </el-dialog>
+    <el-dialog title="智能化知识库与知识图谱" :visible.sync="searchDialogVisible" width="70%" :before-close="closeSearchDialog"
+      custom-class="user-info-dialog" :append-to-body="true" :destroy-on-close="true" :close-on-click-modal="false"
+      :close-on-press-escape="true" :modal="false" :show-close="false" :style="dialogStyle">
+      <div slot="title" class="custom-dialog-title">
+        <span style="color: #fff;">智能化知识库与知识图谱</span>
+        <el-button class="header-close-btn" size="small" @click="searchDialogVisible = false">关闭</el-button>
+      </div>
+      <div class="container-search" style="width: 100%;overflow-y: auto;">
+        <div class="search-box">
+          <el-input v-model="searchQuery" placeholder="搜索内容" prefix-icon="el-icon-search" clearable
+            @input="handleSearch"></el-input>
+          <el-button type="primary" class="search-btn">2D可视化</el-button>
+          <el-button type="primary" class="search-btn">3D可视化</el-button>
+        </div>
+        
+        <div class="knowledge-grid">
+          <!-- 第一行图片 -->
+          <div class="knowledge-item" v-for="(item, index) in knowledgeItems.slice(0, 5)" :key="'row1-' + index">
+            <div class="image-container">
+              <img :src="item.image" :alt="item.title" class="knowledge-image" />
+              <div class="image-title">{{ item.title }}</div>
+            </div>
+          </div>
+          
+          <!-- 第二行图片 -->
+          <div class="knowledge-item" v-for="(item, index) in knowledgeItems.slice(5, 10)" :key="'row2-' + index">
+            <div class="image-container">
+              <img :src="item.image" :alt="item.title" class="knowledge-image" />
+              <div class="image-title">{{ item.title }}</div>
+            </div>
+          </div>
+          
+          <!-- 第三行图片 -->
+          <div class="knowledge-item" v-for="(item, index) in knowledgeItems.slice(10, 15)" :key="'row3-' + index">
+            <div class="image-container">
+              <img :src="item.image" :alt="item.title" class="knowledge-image" />
+              <div class="image-title">{{ item.title }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </el-dialog>
   </div>
 </template>
@@ -577,6 +621,10 @@ import AssessmentIndex from '../management/AssessmentIndex.vue'
 import AssessmentAlgorithm from '../management/AssessmentAlgorithm.vue'
 import LogManagement from '../management/LogManagement.vue'
 import TaskDetail from '../tasks/TaskDetail.vue'
+import ContentManagement from '../management/Content.vue'
+import ScenePractical from '../management/ScenePractical.vue'
+import AssessmentResults from '../management/AssessmentResults.vue'
+import AssessmentReplay from '../management/AssessmentReplay.vue'
 export default {
   name: 'BattleSimulation',
   components: {
@@ -605,10 +653,15 @@ export default {
     AssessmentIndex,
     AssessmentAlgorithm,
     LogManagement,
-    TaskDetail
+    TaskDetail,
+    ContentManagement,
+    ScenePractical,
+    AssessmentResults,
+    AssessmentReplay
   },
   data() {
     return {
+      searchQuery:'',
       isMenuCollapsed: false, // 添加菜单折叠状态变量，默认为展开状态
       activeMenuItem: null,
       hoveredItem: null,
@@ -618,7 +671,7 @@ export default {
         { key: "applicationScenario", iconImage: "task.png", name: "应用场景构建管理" },
         { key: "simulate", iconImage: "algorithm.png", name: "智能模拟认知管理" },
         { key: "score", iconImage: "Vector.png", name: "智能考核评估管理" },
-
+        { key: "search", iconImage: "Search.png", name: "智能化知识库与知识图谱" },
       ],
       secondaryMenus: {
         user: [
@@ -633,6 +686,7 @@ export default {
         applicationScenario: [
 
         ],
+        search: [],
         simulate: [
           { key: "subject", name: "科目设置与选择" },
           { key: "scene", name: "场景实操" },
@@ -709,8 +763,9 @@ export default {
       intelligentAnalysisDialogVisible: false, // 智能系统分析及展示弹窗可见性
       assessmentIndexDialogVisible: false, // 考核评估指标管理弹窗可见性
       assessmentAlgorithmDialogVisible: false, // 考核评估算法管理弹窗可见性
+      searchDialogVisible: false,
       isClosingDialog: false, // 标记对话框是否正在关闭中
-      taskDetailDialogVisible:false,
+      taskDetailDialogVisible: false,
 
       // 视频相关
       showHelpPanel: false,
@@ -765,7 +820,69 @@ export default {
       doorsOpening: false,
       taskItems: [],
       hasMissionGroups: false, // Add a flag to track if mission groups exist
-      missionName: ''
+      missionName: '',
+      knowledgeItems: [
+        { 
+          image: require('@/assets/images/equipment-1.png'),
+          title: '单兵单兵人员装备检查'
+        },
+        { 
+          image: require('@/assets/images/oil-delivery-1.png'),
+          title: '实施油料加注操作'
+        },
+        { 
+          image: require('@/assets/images/sanitation-1.png'),
+          title: '单兵单兵人员装备检查'
+        },
+        { 
+          image: require('@/assets/images/equipment-2.png'),
+          title: '坦克人员入车操作步骤'
+        },
+        { 
+          image: require('@/assets/images/supply-1.png'),
+          title: '多名伤员在战场上实施底部救护'
+        },
+        { 
+          image: require('@/assets/images/equipment-3.png'),
+          title: '单兵单兵人员装备检查'
+        },
+        { 
+          image: require('@/assets/images/oil-delivery-2.png'),
+          title: '柱塔式发动机结构'
+        },
+        { 
+          image: require('@/assets/images/sanitation-2.png'),
+          title: '润滑油压力表检查'
+        },
+        { 
+          image: require('@/assets/images/equipment-4.png'),
+          title: '伤口处理方法步骤'
+        },
+        { 
+          image: require('@/assets/images/supply-2.png'),
+          title: '武装人员在战场中穿越障碍物'
+        },
+        { 
+          image: require('@/assets/images/equipment-5.png'),
+          title: '单兵单兵人员装备检查'
+        },
+        { 
+          image: require('@/assets/images/oil-delivery-3.png'),
+          title: '实施油料加注操作'
+        },
+        { 
+          image: require('@/assets/images/sanitation-3.png'),
+          title: '单兵单兵人员装备检查'
+        },
+        { 
+          image: require('@/assets/images/equipment-6.png'),
+          title: '坦克人员入车操作步骤'
+        },
+        { 
+          image: require('@/assets/images/supply-3.png'),
+          title: '多名伤员在战场上实施底部救护'
+        }
+      ]
     };
   },
   computed: {
@@ -887,11 +1004,17 @@ export default {
         // 否则激活点击的菜单项
         this.activeMenuItem = key;
         this.activeSubmenuItem = null;
-        this.showSecondaryMenu = true; // 显示二级菜单
 
-        // 如果点击的是应用场景构建管理，直接显示任务基本设置弹窗
-        if (key === 'applicationScenario') {
-          this.showTaskSettingsDialog();
+        // 如果点击的是应用场景构建管理，直接显示任务配置弹窗，不显示二级菜单
+        if (key === 'applicationScenario' || key === 'search') {
+          this.showSecondaryMenu = false; // 不显示二级菜单
+          if (key === 'applicationScenario') {
+            this.taskDialogVisible = true; // 弹出任务配置弹窗
+          } else if (key === 'search') {
+            this.searchDialogVisible = true; // 弹出智能知识库搜索弹窗
+          }
+        } else {
+          this.showSecondaryMenu = true; // 其他菜单正常展开二级菜单
         }
       }
     },
@@ -1523,6 +1646,12 @@ export default {
         }
       }
     },
+    handleSearch(){
+    console.log('搜索内容')
+    },
+    closeSearchDialog(){
+      this.searchDialogVisible = false
+    },
     closeUserInfoDialog() {
       this.userInfoDialogVisible = false
     },
@@ -1534,6 +1663,7 @@ export default {
     },
     closeTaskDialog() {
       this.taskDialogVisible = false;
+      this.taskDetailDialogVisible = false
     },
     showTaskAssignmentDialog() {
       this.taskSettingsDialogVisible = false;
@@ -1654,7 +1784,7 @@ export default {
       // this.showTaskSettingsDialog();
       this.showMixTaskDialog();
     },
-    taskDetail(){
+    taskDetail() {
       this.taskDetailDialogVisible = true
 
     },
@@ -1773,6 +1903,63 @@ export default {
 </script>
 
 <style scoped>
+/* 知识库样式 */
+.search-box {
+  display: flex;
+  margin: 20px auto;
+  align-items: center;
+  width: 50%;
+  justify-content: center;
+}
+
+.search-btn {
+  margin-left: 10px;
+  background-color: #409EFF;
+  color: white;
+}
+
+.knowledge-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+  padding: 20px;
+}
+
+.knowledge-item {
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.knowledge-item:hover {
+  transform: scale(1.05);
+}
+
+.image-container {
+  position: relative;
+  width: 100%;
+  height: 160px;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.knowledge-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-title {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 8px;
+  font-size: 12px;
+  text-align: center;
+}
+
 .container {
   width: 100%;
   height: 100vh;
@@ -1791,6 +1978,18 @@ export default {
   font-style: normal;
 }
 
+.search-box {
+  width: 507px;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.menu-icon-img {
+  /* width: 30px;
+  height: 30px; */
+}
 
 .door-container {
   position: fixed;
@@ -1941,7 +2140,8 @@ export default {
   /* Prevent canvas overflow */
   max-height: calc(100vh - 100px);
   /* Prevent stretching too far in fullscreen */
-  background-image: url('../../assets/taskPic/2.png');
+  /* background-image: url('../../assets/taskPic/2.png'); */
+  background-image: url('../../assets/loginaction.png');
   background-size: 100% 100%;
   background-repeat: no-repeat;
   background-position: center;

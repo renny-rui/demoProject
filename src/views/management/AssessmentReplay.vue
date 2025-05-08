@@ -1,5 +1,5 @@
 <template>
-  <div class="content-management">
+  <div class="assessment-replay">
     <!-- 视频列表页面 -->
     <div v-if="!showVideoPlayer">
       
@@ -7,22 +7,23 @@
       <div class="action-bar">
         <div class="search-box">
           <el-input
+          style="color: #c1ffff;"
             v-model="searchQuery"
-            placeholder="搜索视频名称"
+            placeholder="搜索考核记录"
             prefix-icon="el-icon-search"
             clearable
             @input="handleSearch"
           ></el-input>
         </div>
         <div class="action-buttons">
-          <el-button type="primary" @click="showUploadDialog">
-            <i class="el-icon-upload"></i> 上传视频
+          <el-button type="primary" @click="showUploadDialog" style="color: #000;">
+            <i class="el-icon-upload"></i> 上传考核记录
           </el-button>
         </div>
       </div>
       
       <div class="content-box">
-        <el-empty v-if="filteredVideos.length === 0" description="暂无视频"></el-empty>
+        <el-empty v-if="filteredVideos.length === 0" description="暂无考核记录"></el-empty>
         <div v-else class="video-grid">
           <div 
             v-for="video in filteredVideos" 
@@ -38,6 +39,7 @@
             </div>
             <div class="video-info">
               <div class="video-title">{{ video.OrgName }}</div>
+              <div class="video-date">{{ formatDate(video.CreateTime) }}</div>
               <div class="video-actions">
                 <el-button 
                   type="danger" 
@@ -70,26 +72,48 @@
           @ended="videoEnded"
         ></video>
       </div>
+      <div class="assessment-data" v-if="currentVideo.assessmentData">
+        <h3>考核数据分析</h3>
+        <div class="data-grid">
+          <div class="data-item">
+            <div class="data-label">总体评分</div>
+            <div class="data-value">{{ currentVideo.assessmentData.score || '暂无数据' }}</div>
+          </div>
+          <div class="data-item">
+            <div class="data-label">完成时间</div>
+            <div class="data-value">{{ currentVideo.assessmentData.completionTime || '暂无数据' }}</div>
+          </div>
+          <div class="data-item">
+            <div class="data-label">操作准确率</div>
+            <div class="data-value">{{ currentVideo.assessmentData.accuracy || '暂无数据' }}</div>
+          </div>
+          <div class="data-item">
+            <div class="data-label">团队协作评分</div>
+            <div class="data-value">{{ currentVideo.assessmentData.teamwork || '暂无数据' }}</div>
+          </div>
+        </div>
+      </div>
     </div>
     
     <!-- 上传视频对话框 -->
     <el-dialog
-      title="上传视频"
+      title="上传考核记录"
       :visible.sync="uploadDialogVisible"
       width="500px"
       custom-class="upload-dialog"
-     :modal="false">
+      :modal="false">
       <!-- 自定义Num输入字段 -->
       <div class="custom-num-input">
         <el-form :model="uploadForm" label-width="100px">
-          <el-form-item label="自定义编号" required>
+          <el-form-item label="考核编号" required>
             <el-input 
               v-model="uploadForm.customNum" 
-              placeholder="请输入自定义编号"
+              placeholder="请输入考核编号"
               clearable
             ></el-input>
-            <div class="el-form-item__tip">请输入唯一的自定义编号</div>
+            <div class="el-form-item__tip">请输入唯一的考核编号</div>
           </el-form-item>
+          
         </el-form>
       </div>
       
@@ -113,9 +137,9 @@
         <el-progress :percentage="uploadProgress" :stroke-width="15"></el-progress>
         <div class="progress-text">{{ uploadProgressText }}</div>
       </div>
-      <span slot="footer" class="dialog-footer">
+      <span slot="footer" class="dialog-footer" style="    display: flex; justify-content: center;">
         <el-button @click="uploadDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="submitUpload" :disabled="!hasFile || uploading">上传</el-button>
+        <el-button type="primary" @click="submitUpload" :disabled="!hasFile || uploading" style="color: #000;">上传</el-button>
       </span>
     </el-dialog>
     
@@ -129,7 +153,7 @@
     >
       <div class="delete-confirm-content">
         <i class="el-icon-warning warning-icon"></i>
-        <p>确定要删除视频 <span class="delete-filename">{{ deleteTarget ? deleteTarget.OrgName : '' }}</span> 吗？</p>
+        <p>确定要删除考核记录 <span class="delete-filename">{{ deleteTarget ? deleteTarget.OrgName : '' }}</span> 吗？</p>
         <p class="delete-warning">此操作不可逆，请谨慎操作！</p>
       </div>
       <span slot="footer" class="dialog-footer">
@@ -144,7 +168,7 @@
 import { getFileList, uploadFile, deleteFile } from '@/api/file';
 
 export default {
-  name: "ContentManagement",
+  name: "AssessmentReplay",
   data() {
     return {
       videoList: [],
@@ -160,7 +184,7 @@ export default {
       deleteDialogVisible: false,
       deleteTarget: null,
       uploadForm: {
-        customNum: '' // 自定义Num值
+        customNum: '', // 自定义Num值
       }
     };
   },
@@ -185,9 +209,9 @@ export default {
     // 获取视频列表
     fetchVideoList() {
       this.loading = true;
-      getFileList({ FileType: 4 })
+      getFileList({ FileType: 5 }) // 使用FileType 5表示考核记录视频
         .then(response => {
-          console.log('视频列表响应:', response);
+          console.log('考核记录列表响应:', response);
           if (response && response.success) {
             // 如果返回的是单个对象，转换为数组
             if (response.data && !Array.isArray(response.data)) {
@@ -195,13 +219,24 @@ export default {
             } else {
               this.videoList = response.data || [];
             }
+            
+            // 为每个视频添加模拟的考核数据
+            this.videoList.forEach(video => {
+              // 添加模拟的考核数据
+              video.assessmentData = {
+                score: Math.floor(Math.random() * 30) + 70, // 70-100之间的随机分数
+                completionTime: `${Math.floor(Math.random() * 30) + 10}分钟`, // 10-40分钟的随机完成时间
+                accuracy: `${Math.floor(Math.random() * 20) + 80}%`, // 80%-100%的随机准确率
+                teamwork: Math.floor(Math.random() * 30) + 70 // 70-100之间的随机团队协作分数
+              };
+            });
           } else {
-            this.$message.error(response?.msg || '获取视频列表失败');
+            this.$message.error(response?.msg || '获取考核记录列表失败');
           }
         })
         .catch(error => {
-          console.error('获取视频列表失败:', error);
-          this.$message.error('获取视频列表失败');
+          console.error('获取考核记录列表失败:', error);
+          this.$message.error('获取考核记录列表失败');
         })
         .finally(() => {
           this.loading = false;
@@ -263,15 +298,14 @@ export default {
     
     // 处理文件上传
     handleFileUpload({ file }) {
-      // 这里只是将文件添加到fileList，不实际上传
-      // 实际上传在点击上传按钮时进行
+      // 将文件添加到列表中，但不立即上传
       this.fileList = [{ name: file.name, raw: file }];
       return false; // 阻止默认上传行为
     },
     
-    // 处理超出文件数限制
+    // 处理超出文件数量限制
     handleExceed() {
-      this.$message.warning('只能上传一个视频文件');
+      this.$message.warning('只能上传一个文件!');
     },
     
     // 处理移除文件
@@ -281,18 +315,27 @@ export default {
     
     // 提交上传
     submitUpload() {
-      if (this.fileList.length === 0) {
-        this.$message.warning('请先选择要上传的视频文件');
+      if (!this.fileList.length) {
+        this.$message.warning('请选择要上传的文件!');
         return;
       }
       
-      // 验证自定义Num是否填写
       if (!this.uploadForm.customNum) {
-        this.$message.warning('请输入自定义编号');
+        this.$message.warning('请输入考核编号!');
+        return;
+      }
+      
+      if (!this.uploadForm.name) {
+        this.$message.warning('请输入考核名称!');
         return;
       }
       
       const file = this.fileList[0].raw;
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('FileType', 5); // 使用FileType 5表示考核记录视频
+      formData.append('Num', this.uploadForm.customNum); // 添加自定义Num值
+      
       this.uploading = true;
       this.uploadProgress = 0;
       this.uploadProgressText = '准备上传...';
@@ -300,43 +343,32 @@ export default {
       // 模拟上传进度
       const progressInterval = setInterval(() => {
         if (this.uploadProgress < 90) {
-          this.uploadProgress += Math.floor(Math.random() * 10);
-          if (this.uploadProgress > 90) this.uploadProgress = 90;
-          this.uploadProgressText = `上传中 ${this.uploadProgress}%`;
+          this.uploadProgress += Math.floor(Math.random() * 10) + 1;
+          this.uploadProgressText = `上传中... ${this.uploadProgress}%`;
         }
-      }, 500);
+      }, 300);
       
-      // 调用上传API
-      // 确保将Num参数作为字符串传递
-      const numValue = String(this.uploadForm.customNum);
-      console.log('上传参数:', { file: file.name, Num: numValue, type: typeof numValue });
-      uploadFile(file, numValue) // 传递自定义Num值
+      uploadFile(formData)
         .then(response => {
           clearInterval(progressInterval);
           this.uploadProgress = 100;
-          this.uploadProgressText = '上传完成';
+          this.uploadProgressText = '上传完成!';
           
           if (response && response.success) {
-            this.$message.success('视频上传成功');
-            // 重新获取视频列表
-            this.fetchVideoList();
-            // 关闭对话框
-            setTimeout(() => {
-              this.uploadDialogVisible = false;
-              this.uploading = false;
-              this.fileList = [];
-            }, 1000);
+            this.$message.success('考核记录上传成功!');
+            this.uploadDialogVisible = false;
+            this.fetchVideoList(); // 刷新视频列表
           } else {
-            this.$message.error(response?.msg || '视频上传失败');
-            this.uploading = false;
+            this.$message.error(response?.msg || '考核记录上传失败!');
           }
         })
         .catch(error => {
           clearInterval(progressInterval);
-          console.error('视频上传失败:', error);
-          this.$message.error('视频上传失败');
+          console.error('考核记录上传失败:', error);
+          this.$message.error('考核记录上传失败!');
+        })
+        .finally(() => {
           this.uploading = false;
-          this.uploadProgress = 0;
         });
     },
     
@@ -349,35 +381,41 @@ export default {
     // 确认删除文件
     confirmDeleteFile() {
       if (!this.deleteTarget) return;
-
-      console.log('删除视频：',this.deleteTarget)
       
-      deleteFile(this.deleteTarget.Num)
+      deleteFile({ Id: this.deleteTarget.Id })
         .then(response => {
           if (response && response.success) {
-            this.$message.success('视频删除成功');
-            // 从列表中移除该视频
-            this.videoList = this.videoList.filter(v => v.Num !== this.deleteTarget.Num);
+            this.$message.success('考核记录删除成功!');
+            this.videoList = this.videoList.filter(v => v.Id !== this.deleteTarget.Id);
             this.deleteDialogVisible = false;
             this.deleteTarget = null;
           } else {
-            this.$message.error(response?.msg || '视频删除失败');
+            this.$message.error(response?.msg || '考核记录删除失败!');
           }
         })
         .catch(error => {
-          console.error('视频删除失败:', error);
-          this.$message.error('视频删除失败');
+          console.error('考核记录删除失败:', error);
+          this.$message.error('考核记录删除失败!');
         });
+    },
+    
+    // 格式化日期
+    formatDate(dateString) {
+      if (!dateString) return '';
+      
+      const date = new Date(dateString);
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
     }
   }
 };
 </script>
 
 <style scoped>
-.content-management {
+.assessment-replay {
   padding: 20px;
-  background-color: #7B8B9B;
-  min-height: 100vh;
+  height: 100%;
+  background-color: #2e2e3a;
+  color: #fff;
 }
 
 .action-bar {
@@ -392,51 +430,42 @@ export default {
 }
 
 .content-box {
-  background-color: #505962;
-  border-radius: 5px;
+  background-color: #3a3a48;
+  border-radius: 4px;
   padding: 20px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-  margin-top: 20px;
+  min-height: 500px;
 }
 
-/* 视频网格样式 */
 .video-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 20px;
 }
 
 .video-card {
-  border-radius: 8px;
+  background-color: #2e2e3a;
+  border-radius: 4px;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  cursor: pointer;
-  background-color: #fff;
+  transition: transform 0.3s ease;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 }
 
 .video-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 5px 15px 0 rgba(0, 0, 0, 0.2);
 }
 
 .video-thumbnail {
   position: relative;
-  width: 100%;
-  height: 0;
-  padding-bottom: 56.25%; /* 16:9 宽高比 */
-  background-color: #000;
+  height: 150px;
+  cursor: pointer;
   overflow: hidden;
 }
 
 .video-thumbnail video {
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  pointer-events: none; /* 防止在缩略图上点击视频 */
 }
 
 .play-icon {
@@ -446,7 +475,7 @@ export default {
   transform: translate(-50%, -50%);
   width: 50px;
   height: 50px;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(0, 0, 0, 0.5);
   border-radius: 50%;
   display: flex;
   justify-content: center;
@@ -454,99 +483,112 @@ export default {
   color: #fff;
   font-size: 24px;
   opacity: 0.8;
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition: opacity 0.3s ease;
 }
 
-.video-card:hover .play-icon {
+.video-thumbnail:hover .play-icon {
   opacity: 1;
-  transform: translate(-50%, -50%) scale(1.1);
 }
 
 .video-info {
-  background-color: #333;
   padding: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 
 .video-title {
-  font-size: 14px;
-  font-weight: 500;
-  color: #fff;
+  font-weight: bold;
+  margin-bottom: 5px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  flex: 1;
-  margin-right: 10px;
+}
+
+.video-date {
+  font-size: 12px;
+  color: #aaa;
+  margin-bottom: 10px;
 }
 
 .video-actions {
   display: flex;
-  gap: 5px;
+  justify-content: flex-end;
 }
 
-/* 视频播放器样式 */
 .video-player-container {
-  background-color: #505962;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  height: 100%;
 }
 
 .player-header {
   display: flex;
   align-items: center;
-  padding: 15px 20px;
-  background-color: #505962;
-  border-bottom: 1px solid #e6e6e6;
+  margin-bottom: 20px;
 }
 
 .back-button {
   background: none;
   border: none;
-  color: #c1ffff;
-  font-size: 14px;
+  color: #fff;
   cursor: pointer;
+  font-size: 16px;
   display: flex;
   align-items: center;
-  padding: 5px 10px;
-  margin-right: 15px;
-  border-radius: 4px;
-  transition: background-color 0.3s;
+  margin-right: 20px;
 }
 
 .back-button:hover {
-  background-color: rgba(64, 158, 255, 0.1);
-}
-
-.back-button i {
-  margin-right: 5px;
-}
-
-.player-header h2 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 500;
-  color: #333;
-  flex: 1;
+  color: #409EFF;
 }
 
 .video-player {
   width: 100%;
+  max-height: 70vh;
   background-color: #000;
+  border-radius: 4px;
+  overflow: hidden;
 }
 
 .video-player video {
   width: 100%;
-  max-height: calc(100vh - 150px);
-  display: block;
+  height: 100%;
+  max-height: 70vh;
 }
 
-h1 {
-  color: #fff;
-  font-size: 24px;
-  margin-bottom: 20px;
+.assessment-data {
+  margin-top: 20px;
+  background-color: #3a3a48;
+  border-radius: 4px;
+  padding: 20px;
+}
+
+.assessment-data h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #c1ffff;
+  border-left: 4px solid #c1ffff;
+  padding-left: 10px;
+}
+
+.data-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.data-item {
+  background-color: #2e2e3a;
+  padding: 15px;
+  border-radius: 4px;
+}
+
+.data-label {
+  font-size: 14px;
+  color: #aaa;
+  margin-bottom: 5px;
+}
+
+.data-value {
+  font-size: 18px;
+  font-weight: bold;
+  color: #c1ffff;
 }
 
 /* 上传对话框样式 */
@@ -579,9 +621,9 @@ h1 {
   color: #c1ffff;
 }
 
-/* 删除对话框样式 */
+
 .delete-dialog {
-  background-color: #505962;
+  background-color: #3a3a48;
   color: #fff;
 }
 
@@ -593,7 +635,7 @@ h1 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px 0;
+  text-align: center;
 }
 
 .warning-icon {
@@ -604,7 +646,7 @@ h1 {
 
 .delete-filename {
   font-weight: bold;
-  color: #c1ffff;
+  color: #F56C6C;
 }
 
 .delete-warning {
@@ -612,43 +654,10 @@ h1 {
   margin-top: 10px;
 }
 
-/* 覆盖Element UI样式 */
-::v-deep .el-upload-dragger {
-  background-color: #383D44;
-  border: 1px dashed #c1ffff;
-}
-
-::v-deep .el-upload-dragger:hover {
-  border-color: #409EFF;
-}
-
-::v-deep .el-upload__text {
-  color: #ddd;
-}
-
-::v-deep .el-upload__tip {
-  color: #aaa;
-}
-
-::v-deep .el-button--danger {
-  background-color: #F56C6C;
-  border-color: #F56C6C;
-}
-
-::v-deep .el-button--primary {
-  background-color: #c1ffff;
-  border-color: #c1ffff;
-  color: #000;
-}
-
-::v-deep .el-button--primary:hover {
-  background-color: #a0e0e0;
-  border-color: #a0e0e0;
-}
-
+/* 自定义Element UI样式 */
 ::v-deep .el-input__inner {
-  background-color: #383D44;
-  border-color: #4e6e8e;
+  background-color: #2e2e3a;
+  border-color: #4a4a5a;
   color: #fff;
 }
 
@@ -656,6 +665,29 @@ h1 {
   border-color: #c1ffff;
 }
 
+::v-deep .el-form-item__label {
+  color: #fff;
+}
+
+::v-deep .el-upload-dragger {
+  background-color: #2e2e3a;
+  border-color: #4a4a5a;
+}
+
+::v-deep .el-upload-dragger:hover {
+  border-color: #c1ffff;
+}
+
+::v-deep .el-upload__text {
+  color: #fff;
+}
+
+::v-deep .el-upload__tip {
+  color: #aaa;
+}
+.action-buttons{
+  color: #000;
+}
 ::v-deep .el-input__icon {
   color: #c1ffff;
 }

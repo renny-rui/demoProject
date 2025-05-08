@@ -172,6 +172,54 @@ export function getMissionTypeRole() {
   });
 }
 
+export function getMissionProcess(params) {
+  const token = localStorage.getItem('token'); // 从 localStorage 获取 Token
+  
+  return service({
+    url: '/Mission/UpdateProcess',
+    method: 'post',
+    params,
+    headers: {
+      'Authorization': token ? `Bearer ${token}` : ''
+    }
+  });
+}
+
+/**
+ * 获取任务人员配置
+ * @param {Number|String} MissionId 任务ID
+ * @returns {Promise} 返回Promise对象
+ */
+export function getMissionMembers(MissionId) {
+  const token = localStorage.getItem('token');
+  const formattedToken = formatToken(token);
+  
+  return service({
+    url: `/Mission/Member?MissionId=${MissionId}`,
+    method: 'post',
+    headers: {
+      'Authorization': formattedToken ? `Bearer ${formattedToken}` : '',
+      'Content-Type': 'application/json'
+    }
+  });
+}
+
+export function getMissionList(params) {
+  // 从localStorage获取token
+  const token = localStorage.getItem('token');
+  const formattedToken = formatToken(token);
+  console.log('最新的token:',formattedToken)
+  return service({
+    url: '/Mission/List',
+    method: 'post',
+    params,
+    headers: {
+      'Authorization': formattedToken ? `Bearer ${formattedToken}` : ''
+    }
+  });
+}
+
+
 export default {
   addMission,
   getMissionLastList,
@@ -180,5 +228,8 @@ export default {
   getDeviceList,
   getPeopleList,
   getConfig,
-  getMissionTypeRole
+  getMissionTypeRole,
+  getMissionProcess,
+  getMissionMembers,
+  getMissionList
 };
