@@ -305,20 +305,62 @@ export default {
   },
   computed: {
     getTerrainImage() {
-      // 只有选择了方案才显示图片
-      return this.selectedPlan ? 'url(' + require('@/assets/taskPic/3.png') + ')' : '';
+      if (!this.selectedPlan) return '';
+      
+      // 根据选择的方案显示不同的地形图片
+      if (this.selectedPlan.includes('夜间雨林') || this.selectedPlan.includes('丛林')) {
+        return 'url(' + require('@/assets/taskPic/3.png') + ')';
+      } else if (this.selectedPlan.includes('凌晨岸滩') || this.selectedPlan.includes('岸滩')) {
+        return 'url(' + require('@/assets/taskPic/2.png') + ')';
+      } else if (this.selectedPlan.includes('下午舰船') || this.selectedPlan.includes('舰船')) {
+        return 'url(' + require('@/assets/taskPic/1.png') + ')';
+      }
+      
+      // 默认图片
+      return 'url(' + require('@/assets/taskPic/3.png') + ')';
     },
     getTimeImage() {
-      // 只有选择了方案才显示图片
-      return this.selectedPlan ? 'url(' + require('@/assets/taskPic/5.png') + ')' : '';
+      if (!this.selectedPlan) return '';
+      
+      // 根据选择的方案显示不同的时间图片
+      if (this.selectedPlan.includes('夜间')) {
+        return 'url(' + require('@/assets/taskPic/5.png') + ')';
+      } else if (this.selectedPlan.includes('凌晨')) {
+        return 'url(' + require('@/assets/taskPic/6.png') + ')';
+      } else if (this.selectedPlan.includes('下午')) {
+        return 'url(' + require('@/assets/taskPic/4.png') + ')';
+      }
+      
+      // 默认图片
+      return 'url(' + require('@/assets/taskPic/5.png') + ')';
     },
     getTerrainName() {
-      // 只有选择了方案才显示文本
-      return this.selectedPlan ? '丛林' : '';
+      if (!this.selectedPlan) return '';
+      
+      // 根据选择的方案显示不同的地形名称
+      if (this.selectedPlan.includes('夜间雨林') || this.selectedPlan.includes('丛林')) {
+        return '丛林';
+      } else if (this.selectedPlan.includes('凌晨岸滩') || this.selectedPlan.includes('岸滩')) {
+        return '岸滩';
+      } else if (this.selectedPlan.includes('下午舰船') || this.selectedPlan.includes('舰船')) {
+        return '舰船';
+      }
+      
+      return '';
     },
     getTimeName() {
-      // 只有选择了方案才显示文本
-      return this.selectedPlan ? '夜晚' : '';
+      if (!this.selectedPlan) return '';
+      
+      // 根据选择的方案显示不同的时间名称
+      if (this.selectedPlan.includes('夜间')) {
+        return '夜间';
+      } else if (this.selectedPlan.includes('凌晨')) {
+        return '凌晨';
+      } else if (this.selectedPlan.includes('下午')) {
+        return '下午';
+      }
+      
+      return '';
     },
     getWeatherImage() {
       return this.selectedPlan ? 'url(' + require('@/assets/snow.gif') + ')' : '';
@@ -1012,7 +1054,7 @@ export default {
             BaseSetting: {
               MaxPlayers: finalData.GameConfig.baseSetting.maxPlayers,
               MaxDuration: finalData.GameConfig.baseSetting.maxDuration,
-              HostIP: finalData.GameConfig.baseSetting.hostIP
+              HostIP: "192.168.31.21"
             },
             WarfareSetting: {
               Terrain: finalData.GameConfig.warfareSetting.terrain,

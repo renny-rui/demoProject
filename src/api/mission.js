@@ -174,13 +174,13 @@ export function getMissionTypeRole() {
 
 export function getMissionProcess(params) {
   const token = localStorage.getItem('token'); // 从 localStorage 获取 Token
-  
+  const formattedToken = formatToken(token);
   return service({
     url: '/Mission/UpdateProcess',
     method: 'post',
     params,
     headers: {
-      'Authorization': token ? `Bearer ${token}` : ''
+      'Authorization': formattedToken ? `Bearer ${formattedToken}` : ''
     }
   });
 }
@@ -220,6 +220,59 @@ export function getMissionList(params) {
 }
 
 
+/**
+ * 获取任务详情通过ID
+ * @param {Number|String} MissionId 任务ID
+ * @returns {Promise} 返回Promise对象
+ */
+export function getMissionDetailById(MissionId) {
+  const token = localStorage.getItem('token');
+  const formattedToken = formatToken(token);
+  
+  return service({
+    url: `/Mission/DetailById`,
+    method: 'post',
+    params: { MissionId },
+    headers: {
+      'Authorization': formattedToken ? `Bearer ${formattedToken}` : ''
+    }
+  });
+}
+
+
+/**
+ * 添加任务评论和评分
+ * @param {Number|String} MissionId 任务ID
+ * @param {String} Comment 评论内容
+ * @param {Number} Score 评分
+ * @returns {Promise} 返回Promise对象
+ */
+export function addMissionCommentScore(MissionId, Comment, Score) {
+  const token = localStorage.getItem('token');
+  const formattedToken = formatToken(token);
+  
+  return service({
+    url: `/Mission/X/CommentScore/Mission/Add?MissionId=${MissionId}&Comment=${encodeURIComponent(Comment)}&Score=${Score}`,
+    method: 'post',
+    headers: {
+      'Authorization': formattedToken ? `Bearer ${formattedToken}` : ''
+    }
+  });
+}
+
+export function addMissionTeamCommentScore(TeamId, Comment, Score) {
+  const token = localStorage.getItem('token');
+  const formattedToken = formatToken(token);
+  
+  return service({
+    url: `/Mission/X/CommentScore/Team/Add?MissionId=${TeamId}&Comment=${encodeURIComponent(Comment)}&Score=${Score}`,
+    method: 'post',
+    headers: {
+      'Authorization': formattedToken ? `Bearer ${formattedToken}` : ''
+    }
+  });
+}
+
 export default {
   addMission,
   getMissionLastList,
@@ -231,5 +284,7 @@ export default {
   getMissionTypeRole,
   getMissionProcess,
   getMissionMembers,
-  getMissionList
+  getMissionList,
+  getMissionDetailById,
+  addMissionCommentScore
 };

@@ -470,41 +470,7 @@ body > .v-modal {
   margin-right: 15px;
 }
 
-/* Table styling */
-::v-deep .el-table {
-  background-color: #7B8B9B !important;
-}
 
-::v-deep .el-table__header-wrapper,
-::v-deep .el-table__body-wrapper {
-  background-color: #7B8B9B !important;
-}
-
-::v-deep .el-table td,
-::v-deep .el-table th.is-leaf {
-  background-color: #7B8B9B !important;
-  border-bottom: 1px solid #909399 !important;
-  color: #f0f0f0 !important;
-}
-
-::v-deep .el-table--border::after,
-::v-deep .el-table--group::after,
-::v-deep .el-table::before {
-  background-color: #909399 !important;
-}
-
-::v-deep .el-table--striped .el-table__body tr.el-table__row--striped td {
-  background-color: #7B8B9B !important;
-}
-
-::v-deep .el-table__body tr:hover > td {
-  background-color: #7B8B9B !important;
-}
-
-::v-deep .el-table .el-table__header th {
-  background-color: #6C767F !important;
-  color: #f0f0f0 !important;
-}
 
 /* 角色管理页面特定的对话框样式 */
 ::v-deep .user-dialog {
@@ -540,6 +506,40 @@ body > .v-modal {
 </style>
 
 <style scoped>
+::v-deep .el-table {
+  background-color: #7B8B9B !important;
+}
+
+::v-deep .el-table__header-wrapper,
+::v-deep .el-table__body-wrapper {
+  background-color: #7B8B9B !important;
+}
+
+::v-deep .el-table td,
+::v-deep .el-table th.is-leaf {
+  background-color: #7B8B9B !important;
+  border-bottom: 1px solid #909399 !important;
+  color: #f0f0f0 !important;
+}
+
+::v-deep .el-table--border::after,
+::v-deep .el-table--group::after,
+::v-deep .el-table::before {
+  background-color: #909399 !important;
+}
+
+::v-deep .el-table--striped .el-table__body tr.el-table__row--striped td {
+  background-color: #7B8B9B !important;
+}
+
+::v-deep .el-table__body tr:hover > td {
+  background-color: #7B8B9B !important;
+}
+
+::v-deep .el-table .el-table__header th {
+  background-color: #6C767F !important;
+  color: #f0f0f0 !important;
+}
 /* 新增样式 */
 .form-container-center {
   display: flex;

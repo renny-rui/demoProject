@@ -1,14 +1,13 @@
 <template>
   <div class="container" @click.self="handleContainerClick">
-    <!-- 背景图片 -->
-    <div class="background-image"></div>
-
-    <!-- 战场信息展示区域 - 始终存在但可能被门遮挡 -->
     <div class="full-container">
       <div class="top-border">
         <div class="logo-container">
           <img src="../../assets/logo.png" alt="Logo" class="center-logo">
           <h4 class="system-title">后勤业务能力智能化考核评估软件系统</h4>
+        </div>
+        <div class="logout-container">
+          <el-button type="danger" size="small" icon="el-icon-switch-button" @click="logout" class="logout-button">退出登录</el-button>
         </div>
       </div>
       <div class="between-side left-side">
@@ -65,19 +64,19 @@
         <template v-if="hasMissionGroups">
           <div class="frame-box" style="padding-top: 1px;">
             <div class="frame-top">
-              <h4>任务行动</h4>
+              <h4 style="font-family: 'SourceHanSerifSC', serif;">任务行动</h4>
             </div>
             <div class="frame-content">
               <div style="width: 100%;">
                 <el-row :gutter="16" v-for="(item, index) in taskItems" :key="index" style="margin-bottom: 8px;">
                   <el-col :span="10">
-                    <div style="color: #C1FFFF;font-size: 12px;">【{{ item.name }}】</div>
+                    <div style="color: #C1FFFF;font-size: 12px;font-family: 'SourceHanSerifSC', serif;">【{{ item.name }}】</div>
                   </el-col>
                   <el-col :span="8">
-                    <div style="color: #fff;font-size: 12px;">团队人数{{ item.teamCount }}</div>
+                    <div style="color: #fff;font-size: 12px;font-family: 'SourceHanSerifSC', serif;">团队人数{{ item.teamCount }}</div>
                   </el-col>
                   <el-col :span="6">
-                    <div style="color: #fff;font-size: 12px;">{{ item.personCount }}人</div>
+                    <div style="color: #fff;font-size: 12px;font-family: 'SourceHanSerifSC', serif;">{{ item.personCount }}人</div>
                   </el-col>
                 </el-row>
               </div>
@@ -85,61 +84,159 @@
             </div>
           </div>
           <el-button type="primary" @click="taskDetail" class="detail-button">
-            <i class="el-icon-s-operation">任务详情</i>
+            <i class="el-icon-s-operation" style="font-family: 'SourceHanSerifSC', serif;">任务详情</i>
+           
+          </el-button>
+          <el-button type="primary" @click="startMission" class="start-button">
+            <i class="el-icon-s-operation" style="font-family: 'SourceHanSerifSC', serif;">任务开始</i>
+           
           </el-button>
           <div class="frame-box" style="margin-top: 60px;">
             <div class="frame-content">
               <img src="../../assets/taskPic/3.png" alt="task1" style="width: 100%;height: 130%; object-fit: cover;">
             </div>
           </div>
-          <div class="frame-box" style="margin-top: 40px;">
+          <!-- <div class="frame-box" style="margin-top: 40px;">
             <div class="frame-content">
               <img src="../../assets/snow.gif" alt="task1" style="width: 100%;height: 130%; object-fit: cover;">
+            </div>
+          </div> -->
+          <!-- 添加地图框 -->
+          <div class="frame-box" style="margin-top: 40px;">
+            <div class="frame-content map-container" @click.stop="showBattlefieldSituation">
+              <div class="map-title" style="font-family: 'SourceHanSerifSC', serif;">战场态势</div>
+              <svg width="100%" height="100%" viewBox="0 0 300 150">
+                <!-- 不规则多边形区域 -->
+                <path d="M50,20 L150,10 L220,30 L250,70 L200,110 L100,120 L40,80 Z" 
+                      fill="rgba(193, 255, 255, 0.2)" 
+                      stroke="#C1FFFF" 
+                      stroke-width="2"/>
+                <!-- 添加一些点表示位置 -->
+                <circle cx="100" cy="50" r="3" fill="#C1FFFF"/>
+                <circle cx="220" cy="60" r="3" fill="#FFC1C1"/>
+                <!-- 添加一些虚线表示路径 -->
+                <path d="M100,50 Q150,40 220,60" 
+                      stroke="#666" 
+                      stroke-width="1" 
+                      stroke-dasharray="4,4" 
+                      fill="none"/>
+              </svg>
+              <!-- 添加提示文本 -->
+              <div class="click-hint">点击查看详情</div>
             </div>
           </div>
         </template>
         <template v-else>
           <div class="frame-box" style="padding-top: 1px;">
             <div class="frame-top">
-              <h4 class="task-title">任务行动</h4>
+              <h4 class="task-title" style="font-family: 'SourceHanSerifSC', serif;">任务行动</h4>
             </div>
             <div class="frame-content" style="display: flex;flex-direction: column;">
-              <span style="color: #C1FFFF;">【请发布新任务】</span>
+              <span style="color: #C1FFFF;font-family: 'SourceHanSerifSC', serif;">【请发布新任务】</span>
 
             </div>
           </div>
           <el-button type="primary" @click="startTask" class="add-button">
-            <i class="el-icon-circle-plus-outline">发布任务</i>
+            <i class="el-icon-circle-plus-outline" style="font-family: 'SourceHanSerifSC', serif;">发布任务</i>
           </el-button>
         </template>
       </div>
 
       <!-- 底部卡片区域 -->
       <div class="bottom-cards">
-        <div class="card-item" ref="chart1">
+        <div class="card-item" ref="chart1" @click="showFuelDialog()">
           <div class="card-header">油料前送</div>
+          <div class="card-content-wrapper">
+            <div class="card-data">
+              <div class="data-item">
+                <span class="data-label">进度</span>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: 75%"></div>
+                </div>
+                <span class="data-value">75%</span>
+              </div>
+              <div class="data-item">
+                <span class="data-label">车辆</span>
+                <span class="data-value">12台</span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div class="card-item" ref="chart2">
+        <div class="card-item" ref="chart2" @click="showFuelDialog()">
           <div class="card-header">油料加注</div>
+          <div class="card-content-wrapper">
+            <div class="card-data">
+              <div class="data-item">
+                <span class="data-label">完成量</span>
+                <span class="data-value">4.2吨</span>
+              </div>
+              <div class="data-item">
+                <span class="data-label">效率</span>
+                <span class="data-value highlight">+12%</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="card-item" ref="timerCard">
+        <div class="card-item" ref="timerCard" @click="showSupplyDialog()">
           <div class="card-header">热食制作</div>
-          <!-- <div class="timer-display">{{ formatTime }}</div> -->
+          <div class="card-content-wrapper">
+            <div class="card-data">
+              <div class="data-item">
+                <span class="data-label">当前批次</span>
+                <span class="data-value">3/5</span>
+              </div>
+              <div class="data-item">
+                <span class="data-label">剩余时间</span>
+                <span class="data-value timer">01:45:22</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="card-item" ref="weatherCard">
+        <div class="card-item" ref="weatherCard" @click="showSupplyDialog()">
           <div class="card-header">热食前送</div>
-          <!-- <div class="weather-info">
-            <div class="weather-icon"><i class="el-icon-sunny"></i></div>
-            <div class="weather-text">{{ currentWeather }}</div>
-            <div class="temperature">{{ temperature }}°C</div>
-          </div> -->
+          <div class="card-content-wrapper">
+            <div class="card-data">
+              <div class="data-item">
+                <span class="data-label">路线</span>
+                <span class="data-value">A-3区域</span>
+              </div>
+              <div class="data-item">
+                <span class="data-label">状态</span>
+                <span class="data-value status-active">进行中</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="card-item" ref="chart3">
+        <div class="card-item" ref="chart3" @click="showSanitationDialog()">
           <div class="card-header">卫勤救护</div>
+          <div class="card-content-wrapper">
+            <div class="card-data">
+              <div class="data-item">
+                <span class="data-label">待转运</span>
+                <span class="data-value highlight">3人</span>
+              </div>
+              <div class="data-item">
+                <span class="data-label">医护人员</span>
+                <span class="data-value">8人</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="card-item" ref="chart4">
+        <div class="card-item" ref="chart4" @click="showEquipmentRepairDialog()">
           <div class="card-header">装备抢修</div>
+          <div class="card-content-wrapper">
+            <div class="card-data">
+              <div class="data-item">
+                <span class="data-label">待修复</span>
+                <span class="data-value">5台</span>
+              </div>
+              <div class="data-item">
+                <span class="data-label">完成率</span>
+                <span class="data-value">68%</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -205,27 +302,23 @@
 
 
     <!-- 用户信息对话框 -->
-    <transition name="el-fade-in-linear" @before-leave="beforeLeaveHandler" @leave="leaveHandler">
-      <div v-if="userInfoDialogVisible" class="fade-wrapper">
-        <el-dialog ref="userInfoDialog" title="用户信息" :visible.sync="userInfoDialogVisible" width="70%"
-          :before-close="closeUserInfoDialog" custom-class="user-info-dialog" :append-to-body="false"
-          lock-scroll="false" :destroy-on-close="true" :close-on-click-modal="false" :close-on-press-escape="true"
-          :modal="false" :show-close="false" :style="dialogStyle">
-          <div slot="title" class="custom-dialog-title">
-            <span style="color: #fff;">用户信息</span>
-            <el-button class="header-close-btn" size="small" @click="userInfoDialogVisible = false">关闭</el-button>
-          </div>
-          <UserInfo />
-        </el-dialog>
+    <el-dialog ref="userInfoDialog" title="用户信息" :visible.sync="userInfoDialogVisible" width="70%"
+      :before-close="closeUserInfoDialog" custom-class="user-info-dialog" :append-to-body="true"
+      :lock-scroll="false" :destroy-on-close="true" :close-on-click-modal="false" :close-on-press-escape="true"
+      :modal="false" :show-close="false" :style="dialogStyle">
+      <div slot="title" class="custom-dialog-title">
+        <span style="color: #fff;">用户信息</span>
+        <el-button class="header-close-btn" size="small" @click="userInfoDialogVisible = false">关闭</el-button>
       </div>
-    </transition>
+      <UserInfo />
+    </el-dialog>
 
     <el-dialog title="任务配置" :visible.sync="taskDialogVisible" width="70%" :before-close="closeTaskDialog"
       custom-class="user-info-dialog" :append-to-body="true" :destroy-on-close="true" :close-on-click-modal="false"
       :close-on-press-escape="true" :modal="false" :show-close="false" :style="dialogStyle">
       <div slot="title" class="custom-dialog-title">
         <span style="color: #fff;">任务配置</span>
-        <el-button class="header-close-btn" size="small" @click="closeTaskDialog">关闭</el-button>
+        <el-button class="header-close-btn" size="small" @click="closeDialogWithoutCollapseMenu($event, null, closeTaskDialog)">关闭</el-button>
       </div>
       <mixTask @submit-success="getLastList" />
     </el-dialog>
@@ -235,7 +328,7 @@
       :close-on-press-escape="true" :modal="false" :show-close="false" :style="dialogStyle">
       <div slot="title" class="custom-dialog-title">
         <span style="color: #fff;">任务详情</span>
-        <el-button class="header-close-btn" size="small" @click="closeTaskDialog">关闭</el-button>
+        <el-button class="header-close-btn" size="small" @click="closeDialogWithoutCollapseMenu($event, null, closeTaskDialog)">关闭</el-button>
       </div>
       <TaskDetail @task-completed="getLastList" />
     </el-dialog>
@@ -246,7 +339,7 @@
       :show-close="false" :style="dialogStyle">
       <div slot="title" class="custom-dialog-title">
         <span style="color: #fff;">任务基本设置</span>
-        <el-button class="header-close-btn" size="small" @click="closeTaskSettingsDialog">关闭</el-button>
+        <el-button class="header-close-btn" size="small" @click="closeDialogWithoutCollapseMenu($event, null, closeTaskSettingsDialog)">关闭</el-button>
       </div>
       <DeviceBinding @next-step="showTaskAssignmentDialog" />
     </el-dialog>
@@ -257,7 +350,7 @@
       :show-close="false" :style="dialogStyle">
       <div slot="title" class="custom-dialog-title">
         <span style="color: #fff;">小队任务分配</span>
-        <el-button class="header-close-btn" size="small" @click="closeTaskAssignmentDialog">关闭</el-button>
+        <el-button class="header-close-btn" size="small" @click="closeDialogWithoutCollapseMenu($event, null, closeTaskAssignmentDialog)">关闭</el-button>
       </div>
       <TaskAssignment />
     </el-dialog>
@@ -268,7 +361,7 @@
       :close-on-press-escape="true" :modal="false" :show-close="false" :style="dialogStyle">
       <div slot="title" class="custom-dialog-title">
         <span style="color: #fff;">设备信息</span>
-        <el-button class="header-close-btn" size="small" @click="equipmentDialogVisible = false">关闭</el-button>
+        <el-button class="header-close-btn" size="small" @click="closeDialogWithoutCollapseMenu($event, 'equipmentDialogVisible')">关闭</el-button>
       </div>
       <EquipmentInfo />
     </el-dialog>
@@ -280,7 +373,7 @@
       :show-close="false" :style="dialogStyle">
       <div slot="title" class="custom-dialog-title">
         <span style="color: #fff;">设备分类</span>
-        <el-button class="header-close-btn" size="small" @click="closeDeviceCategoryDialog">关闭</el-button>
+        <el-button class="header-close-btn" size="small" @click="closeDialogWithoutCollapseMenu($event, null, closeDeviceCategoryDialog)">关闭</el-button>
       </div>
       <DeviceCategory />
     </el-dialog>
@@ -584,21 +677,103 @@
       </div>
 
     </el-dialog>
+    <!-- 战场态势放大展示弹窗 -->
+    <transition name="fade">
+      <div class="battlefield-modal-container" v-if="showBattlefieldModal">
+       
+        <div class="battlefield-content" :class="{ 'battlefield-content-active': battlefieldContentActive }">
+          <div class="battlefield-header">
+            <h3 style="color: #000;">战场态势详情</h3>
+            <button class="close-btn" @click.stop="closeBattlefieldModal">×</button>
+          </div>
+        <div class="battlefield-body">
+          <svg width="100%" height="100%" viewBox="0 0 800 600">
+            <!-- 更详细的战场态势图 - 扩展版本 -->
+            <defs>
+              <radialGradient id="area-gradient" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                <stop offset="0%" stop-color="rgba(193, 255, 255, 0.4)" />
+                <stop offset="100%" stop-color="rgba(193, 255, 255, 0.1)" />
+              </radialGradient>
+              <!-- 添加箭头标记 -->
+              <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5"
+                markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#C1FFFF" />
+              </marker>
+            </defs>
+            
+            <!-- 主战区域 -->
+            <path d="M150,100 L350,80 L550,120 L650,250 L600,400 L350,450 L150,380 L100,250 Z" 
+                  fill="url(#area-gradient)" 
+                  stroke="#C1FFFF" 
+                  stroke-width="3"/>
+            
+            <!-- 添加更多详细的点位和路径 -->
+            <!-- 友方单位 -->
+            <circle cx="200" cy="200" r="8" fill="#C1FFFF" />
+            <circle cx="250" cy="180" r="8" fill="#C1FFFF" />
+            <circle cx="180" cy="250" r="8" fill="#C1FFFF" />
+            <circle cx="300" cy="220" r="8" fill="#C1FFFF" />
+            
+            <!-- 敌方单位 -->
+            <circle cx="500" cy="200" r="8" fill="#FFC1C1" />
+            <circle cx="550" cy="250" r="8" fill="#FFC1C1" />
+            <circle cx="480" cy="300" r="8" fill="#FFC1C1" />
+            
+            <!-- 移动路径和战术箭头 -->
+            <path d="M200,200 Q300,180 500,200" 
+                  stroke="#C1FFFF" 
+                  stroke-width="2" 
+                  stroke-dasharray="6,3" 
+                  fill="none"
+                  marker-end="url(#arrow)" />
+                  
+            <path d="M250,180 Q350,150 550,250" 
+                  stroke="#C1FFFF" 
+                  stroke-width="2" 
+                  stroke-dasharray="6,3" 
+                  fill="none"
+                  marker-end="url(#arrow)" />
+                  
+            <!-- 添加地形标记 -->
+            <text x="400" y="150" fill="#C1FFFF" font-size="14" text-anchor="middle">高地</text>
+            <text x="200" y="350" fill="#C1FFFF" font-size="14" text-anchor="middle">补给区</text>
+            <text x="600" y="350" fill="#C1FFFF" font-size="14" text-anchor="middle">敌方阵地</text>
+            
+            <!-- 添加坐标网格 -->
+            <g opacity="0.3">
+              <!-- 水平网格线 -->
+              <line x1="100" y1="100" x2="700" y2="100" stroke="#C1FFFF" stroke-width="1" />
+              <line x1="100" y1="200" x2="700" y2="200" stroke="#C1FFFF" stroke-width="1" />
+              <line x1="100" y1="300" x2="700" y2="300" stroke="#C1FFFF" stroke-width="1" />
+              <line x1="100" y1="400" x2="700" y2="400" stroke="#C1FFFF" stroke-width="1" />
+              <line x1="100" y1="500" x2="700" y2="500" stroke="#C1FFFF" stroke-width="1" />
+              
+              <!-- 垂直网格线 -->
+              <line x1="100" y1="100" x2="100" y2="500" stroke="#C1FFFF" stroke-width="1" />
+              <line x1="200" y1="100" x2="200" y2="500" stroke="#C1FFFF" stroke-width="1" />
+              <line x1="300" y1="100" x2="300" y2="500" stroke="#C1FFFF" stroke-width="1" />
+              <line x1="400" y1="100" x2="400" y2="500" stroke="#C1FFFF" stroke-width="1" />
+              <line x1="500" y1="100" x2="500" y2="500" stroke="#C1FFFF" stroke-width="1" />
+              <line x1="600" y1="100" x2="600" y2="500" stroke="#C1FFFF" stroke-width="1" />
+              <line x1="700" y1="100" x2="700" y2="500" stroke="#C1FFFF" stroke-width="1" />
+            </g>
+          </svg>
+        </div>
+      </div>
+    </div>
+    </transition>
   </div>
 </template>
 
 <script>
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader';
-import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import UserInfo from '@/views/user/UserInfo.vue'; // Import UserInfo component
 import DeviceBinding from '../tasks/DeviceBinding.vue';
 import TaskAssignment from '../tasks/TaskAssignment.vue';
 import EquipmentInfo from '@/views/management/Equipment.vue'; // Import EquipmentInfo component
 import * as echarts from 'echarts';
-import { getMissionLastList } from '@/api/mission';
+import { getMissionLastList, getMissionProcess } from '@/api/mission';
 import DeviceCategory from '../management/DeviceCategory.vue';
 import Organization from '../user/Organization.vue';
 import Roles from '../user/Roles.vue';
@@ -661,11 +836,22 @@ export default {
   },
   data() {
     return {
+      // 3D地球相关数据
+      renderer: null,
+      scene: null,
+      camera: null,
+      earthMesh: null,
+      cloudMesh: null,
+      gridMesh: null,
+      animationId: null,
       searchQuery:'',
       isMenuCollapsed: false, // 添加菜单折叠状态变量，默认为展开状态
       activeMenuItem: null,
       hoveredItem: null,
       showSecondaryMenu: true,
+      // 战场态势相关状态
+      showBattlefieldModal: false,
+      battlefieldContentActive: false,
       primaryMenus: [
         { key: "user", iconImage: "userInfo.png", name: "基础信息管理" },
         { key: "applicationScenario", iconImage: "task.png", name: "应用场景构建管理" },
@@ -936,6 +1122,9 @@ export default {
 
     // 设置定时器，每秒更新一次计时器
     this.startTimer();
+    
+    // 初始化3D地球
+    this.initEarth();
 
     // 随机变化天气
     // this.randomizeWeather();
@@ -991,6 +1180,205 @@ export default {
     clearInterval(this.timerInterval);
   },
   methods: {
+    // 初始化3D地球
+    initEarth() {
+      const container = this.$refs.threeContainer;
+      if (!container) return;
+      
+      const width = container.clientWidth;
+      const height = container.clientHeight;
+
+      // 创建场景
+      const scene = new THREE.Scene();
+      this.scene = scene;
+      
+      // 创建星空背景，这比纯黑色背景更美观
+      this.createStarfield(scene);
+
+      // 创建相机 - 调整FOV和位置使全部地球可见
+      const camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
+      camera.position.z = 2.9; // 增加相机距离，使整个地球可见
+      this.camera = camera;
+
+      // 创建渲染器
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setSize(width, height);
+      container.appendChild(renderer.domElement);
+      this.renderer = renderer;
+
+      // 控制器
+      const controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+
+      // 光源
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+      scene.add(ambientLight);
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+      directionalLight.position.set(5, 3, 5);
+      scene.add(directionalLight);
+
+      // 贴图加载
+      const textureLoader = new THREE.TextureLoader();
+      
+      // 地球材质
+      const earthMaterial = new THREE.MeshPhongMaterial({
+        map: textureLoader.load(require('@/assets/earth.jpg')),
+      });
+
+      // 地球模型 - 调整地球半径为适当大小
+      const earthGeometry = new THREE.SphereGeometry(1.2, 64, 64);
+      const earthMesh = new THREE.Mesh(earthGeometry, earthMaterial);
+      scene.add(earthMesh);
+      this.earthMesh = earthMesh;
+
+      // 云层 - 同比例调整半径
+      const cloudGeometry = new THREE.SphereGeometry(1.212, 64, 64);
+      const cloudMaterial = new THREE.MeshPhongMaterial({
+        map: textureLoader.load(require('@/assets/clouds.png')),
+        transparent: true,
+        opacity: 0.4,
+        depthWrite: false,
+      });
+      const cloudMesh = new THREE.Mesh(cloudGeometry, cloudMaterial);
+      scene.add(cloudMesh);
+      this.cloudMesh = cloudMesh;
+
+      // 水平网格动态Shader
+      const gridVertexShader = `
+        uniform float uTime;
+        varying vec2 vUv;
+        varying vec3 vNormal;
+        void main() {
+          vUv = uv;
+          vNormal = normal;
+
+          // 增强Y轴（纬线方向）的扰动效果
+          vec3 newPosition = position;
+          // 增加波浪振幅和频率
+          newPosition.y += sin(uTime + position.y * 15.0) * 0.025;
+          // 添加X轴扰动，形成交叉波纹效果
+          newPosition.x += cos(uTime * 0.8 + position.x * 12.0) * 0.015;
+          
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
+        }
+      `;
+
+      const gridFragmentShader = `
+        uniform float uTime;
+        varying vec2 vUv;
+        varying vec3 vNormal;
+        void main() {
+          // 增加线宽使网格更明显
+          float lineWidth = 0.015;
+          float alpha = smoothstep(lineWidth, lineWidth + 0.008, abs(vUv.y - 0.5));
+
+          // 增强科技感的脉冲效果
+          float primaryPulse = sin(uTime * 0.8) * 0.6 + 0.4; // 主脉冲，增加振幅
+          float secondaryPulse = sin(uTime * 1.5 + vUv.y * 40.0) * 0.4 + 0.6; // 二级脉冲，增加频率
+          float wavePulse = sin(uTime * 2.0 + vUv.x * 50.0) * 0.3 + 0.7; // 添加水平方向的波动
+          float combinedFlow = primaryPulse * secondaryPulse * wavePulse;
+          
+          // 更鲜明的颜色对比
+          vec3 baseColor = vec3(0.1, 0.5, 1.0); // 深蓝基础色
+          vec3 pulseColor = vec3(0.3, 0.9, 1.0); // 更亮的高亮颜色
+          vec3 finalColor = mix(baseColor, pulseColor, primaryPulse * 0.8);
+          
+          // 增加整体亮度
+          gl_FragColor = vec4(finalColor, alpha * combinedFlow * 1.3);
+        }
+      `;
+
+      const gridUniforms = {
+        uTime: { value: 0 },
+      };
+
+      const gridMaterial = new THREE.ShaderMaterial({
+        uniforms: gridUniforms,
+        vertexShader: gridVertexShader,
+        fragmentShader: gridFragmentShader,
+        transparent: true,
+        wireframe: true,
+        wireframeLinewidth: 2, // 增加线宽
+      });
+
+      // 网格线模型（仅水平线） - 同比例调整半径
+      const gridGeometry = new THREE.SphereGeometry(1.224, 64, 64);
+      const gridMesh = new THREE.Mesh(gridGeometry, gridMaterial);
+      scene.add(gridMesh);
+      this.gridMesh = gridMesh;
+
+      // 动画循环
+      const animate = () => {
+        this.animationId = requestAnimationFrame(animate);
+        const elapsedTime = performance.now() / 1000;
+        gridUniforms.uTime.value = elapsedTime;
+
+        earthMesh.rotation.y += 0.001;
+        cloudMesh.rotation.y += 0.0005;
+        gridMesh.rotation.y += 0.001;
+        
+        // 让星空背景缓慢旋转，增强沉浸感
+        if (this.stars) {
+          this.stars.rotation.y -= 0.0001; // 比地球旋转更缓慢，并且方向相反
+        }
+
+        controls.update();
+        renderer.render(scene, camera);
+      };
+      animate();
+
+      // 窗口大小变化时调整
+      window.addEventListener('resize', this.onWindowResize);
+    },
+
+    // 创建星空背景
+    createStarfield(scene) {
+      // 创建星星粒子
+      const starsGeometry = new THREE.BufferGeometry();
+      const starsMaterial = new THREE.PointsMaterial({
+        color: 0xffffff,
+        size: 0.02,
+        transparent: true,
+        opacity: 0.8,
+        sizeAttenuation: true
+      });
+      
+      // 生成大量星星的位置
+      const starsCount = 10000;
+      const positions = new Float32Array(starsCount * 3);
+      
+      for (let i = 0; i < starsCount; i++) {
+        // 生成处于随机位置的星星，将其分布在一个大球体内
+        const radius = 50 + Math.random() * 100; // 激光混合分布，为星空盯深度
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.random() * Math.PI;
+        
+        // 将球坐标转换为笼坐标
+        positions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
+        positions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
+        positions[i * 3 + 2] = radius * Math.cos(phi);
+      }
+      
+      starsGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      
+      // 创建星系
+      const stars = new THREE.Points(starsGeometry, starsMaterial);
+      scene.add(stars);
+      this.stars = stars; // 存储引用以便后续操作
+    },
+    
+    // 处理窗口大小变化
+    onWindowResize() {
+      const container = this.$refs.threeContainer;
+      if (!container || !this.camera || !this.renderer) return;
+
+      const width = container.clientWidth;
+      const height = container.clientHeight;
+
+      this.camera.aspect = width / height;
+      this.camera.updateProjectionMatrix();
+      this.renderer.setSize(width, height);
+    },
 
     // 切换菜单折叠状态
 
@@ -1216,6 +1604,38 @@ export default {
         }
       }
     },
+
+    closeAllDialogs() {
+  this.userInfoDialogVisible = false;
+  this.organizationDialogVisible = false;
+  this.roleManagementDialogVisible = false;
+  this.permissionsDialogVisible = false;
+  this.fuelDialogVisible = false;
+  this.supplyDialogVisible = false;
+  this.sanitationDialogVisible = false;
+  this.equipmentRepairDialogVisible = false;
+  this.courseManagementDialogVisible = false;
+  this.gradeManagementDialogVisible = false;
+  this.teachingContentDialogVisible = false;
+  this.rulesSystemDialogVisible = false;
+  this.logManagementDialogVisible = false;
+  this.subjectSettingsDialogVisible = false;
+  this.sceneOperationDialogVisible = false;
+  this.taskGroupingDialogVisible = false;
+  this.motionCaptureDialogVisible = false;
+  this.guidanceDialogVisible = false;
+  this.intelligentGuidanceDialogVisible = false;
+  this.trainingDataDialogVisible = false;
+  this.algorithmManagementDialogVisible = false;
+  this.assessmentConfigDialogVisible = false;
+  this.assessmentResultDialogVisible = false;
+  this.assessmentReplayDialogVisible = false;
+  this.intelligentAnalysisDialogVisible = false;
+  this.assessmentIndexDialogVisible = false;
+  this.assessmentAlgorithmDialogVisible = false;
+  this.deviceCategoryDialogVisible=false;
+  this.equipmentDialogVisible=false
+},
 
     // 页面导航
     navigateTo(route) {
@@ -1750,6 +2170,19 @@ export default {
     closePermissionsDialog() {
       this.permissionsDialogVisible = false;
     },
+    // 关闭对话框而不收起左侧菜单
+    closeDialogWithoutCollapseMenu(event, dialogVisibleProp, closeMethod) {
+      // 阻止事件冒泡到容器
+      event.stopPropagation();
+      
+      if (dialogVisibleProp) {
+        // 如果提供了对话框可见性属性名，直接设置为false
+        this[dialogVisibleProp] = false;
+      } else if (closeMethod && typeof closeMethod === 'function') {
+        // 如果提供了关闭方法，调用该方法
+        closeMethod.call(this);
+      }
+    },
     // 处理考核评估配置对话框打开事件
     handleAssessmentConfigOpen() {
       console.log('考核评估配置对话框已打开，刷新数据');
@@ -1786,7 +2219,79 @@ export default {
     },
     taskDetail() {
       this.taskDetailDialogVisible = true
-
+    },
+    
+    /**
+     * 任务开始方法，调用更新任务进度API
+     */
+    startMission() {
+      console.log('开始任务...')
+      
+      // 先调用getMissionLastList获取最新的任务ID
+      getMissionLastList()
+        .then(response => {
+          console.log('获取最新任务成功:', response);
+          
+          if (response ) {
+            // 从响应中提取MissionId
+            const missionId = response.data.MissionLib.MissionId;
+            console.log('获取到的任务ID:', missionId);
+            
+            if (missionId) {
+              // 如果成功获取到ID，则调用更新任务进度API
+              this.updateMissionProcess(missionId);
+            } else {
+              this.$message({
+                type: 'warning',
+                message: '未找到有效的任务ID'
+              });
+            }
+          } else {
+            this.$message({
+              type: 'warning',
+              message: '获取任务数据失败'
+            });
+          }
+        })
+        .catch(error => {
+          console.error('获取最新任务失败:', error);
+          this.$message({
+            type: 'error',
+            message: '获取任务数据失败，请重试'
+          });
+        });
+    },
+    
+    /**
+     * 更新任务进度
+     * @param {String|Number} missionId 任务ID
+     */
+    updateMissionProcess(missionId) {
+      // 调用更新任务进度API
+      const params = {
+        MissionId: missionId,  // 使用任务ID
+        Status: 1              // 状态为1表示任务开始
+      };
+      
+      console.log('调用更新任务进度API，参数:', params);
+      
+      getMissionProcess(params)
+        .then(response => {
+          console.log('任务开始成功:', response);
+          // 显示成功提示
+          this.$message({
+            type: 'success',
+            message: `任务 ${missionId} 已开始`
+          });
+        })
+        .catch(error => {
+          console.error('任务开始失败:', error);
+          // 显示错误提示
+          this.$message({
+            type: 'error',
+            message: `任务 ${missionId} 开始失败，请重试`
+          });
+        });
     },
     //获取任务列表
     getLastList() {
@@ -1860,49 +2365,322 @@ export default {
     },
 
     // 获取最近的任务列表
-    beforeLeaveHandler(el) {
+    beforeLeaveHandler() {
       // 关闭动画开始时的钩子
-      console.log("动画开始关闭", el);
+      console.log("动画开始关闭");
     },
 
-    leaveHandler(el) {
+    leaveHandler() {
       // 关闭动画结束时的钩子
       console.log("动画关闭完成");
     },
-    closeAllDialogs() {
-      this.userInfoDialogVisible = false;
-      this.organizationDialogVisible = false;
-      this.roleManagementDialogVisible = false;
-      this.permissionsDialogVisible = false;
-      this.fuelDialogVisible = false;
-      this.supplyDialogVisible = false;
-      this.sanitationDialogVisible = false;
-      this.equipmentRepairDialogVisible = false;
-      this.courseManagementDialogVisible = false;
-      this.gradeManagementDialogVisible = false;
-      this.teachingContentDialogVisible = false;
-      this.rulesSystemDialogVisible = false;
-      this.logManagementDialogVisible = false;
-      this.subjectSettingsDialogVisible = false;
-      this.sceneOperationDialogVisible = false;
-      this.taskGroupingDialogVisible = false;
-      this.motionCaptureDialogVisible = false;
-      this.guidanceDialogVisible = false;
-      this.intelligentGuidanceDialogVisible = false;
-      this.trainingDataDialogVisible = false;
-      this.algorithmManagementDialogVisible = false;
-      this.assessmentConfigDialogVisible = false;
-      this.assessmentResultDialogVisible = false;
-      this.assessmentReplayDialogVisible = false;
-      this.intelligentAnalysisDialogVisible = false;
-      this.assessmentIndexDialogVisible = false;
-      this.assessmentAlgorithmDialogVisible = false;
+    
+    /**
+     * 显示战场态势弹窗
+     */
+    showBattlefieldSituation() {
+      // 先关闭所有其他对话框
+      this.closeAllDialogs();
+      
+      // 显示战场态势弹窗
+      this.showBattlefieldModal = true;
+      
+      // 使用setTimeout来确保DOM更新后再添加动画类
+      setTimeout(() => {
+        this.battlefieldContentActive = true;
+      }, 10);
+    },
+    
+    /**
+     * 关闭战场态势弹窗
+     */
+    closeBattlefieldModal() {
+      this.battlefieldContentActive = false;
+      // 等待动画完成后再隐藏弹窗
+      setTimeout(() => {
+        this.showBattlefieldModal = false;
+      }, 300); // 300ms与CSS动画时长匹配
+    },
+    
+    /**
+     * 显示油料作业弹窗
+     */
+    showFuelDialog() {
+      // 关闭其他所有弹窗
+      this.closeAllDialogs();
+      
+      // 显示油料作业弹窗
+      this.fuelDialogVisible = true;
+    },
+    
+    /**
+     * 显示补给勤务弹窗
+     */
+    showSupplyDialog() {
+      // 关闭其他所有弹窗
+      this.closeAllDialogs();
+      
+      // 显示补给勤务弹窗
+      this.supplyDialogVisible = true;
+    },
+    
+    /**
+     * 显示卫生勤务弹窗
+     */
+    showSanitationDialog() {
+      // 关闭其他所有弹窗
+      this.closeAllDialogs();
+      
+      // 显示卫生勤务弹窗
+      this.sanitationDialogVisible = true;
+    },
+    
+    /**
+     * 显示装备抢修弹窗
+     */
+    showEquipmentRepairDialog() {
+      // 关闭其他所有弹窗
+      this.closeAllDialogs();
+      
+      // 显示装备抢修弹窗
+      this.equipmentRepairDialogVisible = true;
+    },
+    
+    /**
+     * 退出登录
+     */
+    logout() {
+      // 显示确认对话框
+      this.$confirm('确定要退出登录吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        // 清除本地存储的用户信息
+        localStorage.removeItem('token');
+        localStorage.removeItem('userInfo');
+        
+        // 跳转到登录页面
+        this.$router.push('/login');
+        
+        // 显示成功提示
+        this.$message({
+          type: 'success',
+          message: '退出登录成功'
+        });
+      }).catch(() => {
+        // 取消操作
+        this.$message({
+          type: 'info',
+          message: '已取消退出'
+        });
+      });
     },
   },
 }
 </script>
 
 <style scoped>
+/* 退出登录按钮样式 */
+.logout-container {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  z-index: 1001;
+}
+
+.logout-button {
+  font-weight: bold;
+  transition: all 0.3s;
+}
+
+.logout-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+/* 战场态势弹窗样式 */
+.battlefield-modal-container {
+  position: fixed;
+  top: 26%;
+  left: 24%;
+  right: 0;
+  bottom: 0;
+  width: 60%;
+  height: 60%;
+  z-index: 9999; /* 最高层级 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: auto; /* 确保可以接收点击事件 */
+}
+
+/* 添加淡入淡出动画 */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
+
+.battlefield-modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  pointer-events: auto; /* 遮罩层可以接收点击事件 */
+}
+
+.battlefield-content {
+  position: relative;
+  /* transform: scale(0.5); */
+  width: 80%;
+  height: 80%;
+  max-width: 1200px;
+  max-height: 800px;
+  margin: 0 auto;
+  background: url('../../assets/00_小框.png') no-repeat center;
+  background-size: 100% 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  opacity: 0;
+  transition: all 0.1s ease-out;
+  z-index: 10000; /* 确保内容在遮罩之上 */
+  pointer-events: auto; /* 内容可以接收点击事件 */
+}
+
+/* 玩家标记样式 */
+.player-marker {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.player-marker:hover {
+  transform: scale(1.2);
+}
+
+.player-marker:hover circle:first-child {
+  filter: drop-shadow(0 0 5px currentColor);
+}
+
+.player-marker.friendly:hover circle:first-child {
+  filter: drop-shadow(0 0 8px #00BFFF);
+}
+
+.player-marker.enemy:hover circle:first-child {
+  filter: drop-shadow(0 0 8px #FF4500);
+}
+
+.player-marker text {
+  transition: all 0.3s ease;
+  opacity: 0.8;
+}
+
+.player-marker:hover text {
+  opacity: 1;
+  font-weight: bold;
+}
+
+.battlefield-content-active {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.battlefield-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background: url('../../assets/buttonback.png') no-repeat center;
+  background-size: 100% 100%;
+  margin: 10px auto 0;
+  width: 90%;
+}
+
+.battlefield-header h3 {
+  color: #C1FFFF;
+  margin: 0;
+  font-size: 18px;
+  text-align: center;
+  width: 100%;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #C1FFFF;
+  font-size: 24px;
+  cursor: pointer;
+  position: absolute;
+  right: 40px;
+  top: 25px;
+  z-index: 2002;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.close-btn:hover {
+  transform: scale(1.2);
+  color: white;
+}
+
+.battlefield-body {
+  padding: 20px;
+  height: calc(100% - 80px);
+  background: url('../../assets/cardground.png') no-repeat center;
+  background-size: 100% 100%;
+  margin: 10px auto 0;
+  width: 92%;
+}
+
+/* 点击提示文本 */
+.click-hint {
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: #C1FFFF;
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+/* 添加悬停效果 */
+.map-container {
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.map-container:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 15px rgba(193, 255, 255, 0.5);
+}
+
+.map-title {
+  text-align: center;
+  color: #C1FFFF;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+/* Three.js容器样式 */
+.three-container {
+  position: absolute;
+  top: 60px;
+  left: 0;
+  width: 100%;
+  height: calc(100% - 60px);
+  z-index: 1;
+  overflow: hidden;
+}
+
 /* 知识库样式 */
 .search-box {
   display: flex;
@@ -2029,45 +2807,23 @@ export default {
   transition: opacity 1.2s ease;
 }
 
-.start-button-container {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 101;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .start-button {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  padding: 14px 36px;
-  font-size: 20px;
-  color: #00f6ff;
-  background: rgba(0, 0, 0, 0.4);
-  border: 2px solid #00f6ff;
-  border-radius: 12px;
-  text-shadow: 0 0 8px #00f6ff;
-  box-shadow: 0 0 20px rgba(0, 246, 255, 0.3);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: bold;
-  letter-spacing: 2px;
+  background-color: #C1FFFF !important;
+  border-color: #C1FFFF !important;
+  position: absolute;
+  left: 1px;
+  top: 209px;
+  color: #333 !important;
+  /* Adding darker text color for better contrast */
 }
 
-.start-button:hover {
-  background-color: rgba(0, 0, 0, 0.6);
-  box-shadow: 0 0 40px #00f6ff, 0 0 10px #00f6ff inset;
-  transform: translate(-50%, -50%) scale(1.05);
-}
-
+.start-button:hover,
+.start-button:focus,
 .start-button:active {
-  background-color: rgba(0, 0, 0, 0.8);
-  box-shadow: 0 0 60px #00f6ff inset;
+  background-color: #C1FFFF !important;
+  border-color: #C1FFFF !important;
+  color: #333 !important;
 }
 
 .door::before,
@@ -2141,7 +2897,7 @@ export default {
   max-height: calc(100vh - 100px);
   /* Prevent stretching too far in fullscreen */
   /* background-image: url('../../assets/taskPic/2.png'); */
-  background-image: url('../../assets/loginaction.png');
+  background-image: url('../../assets/background.jpg');
   background-size: 100% 100%;
   background-repeat: no-repeat;
   background-position: center;
@@ -2363,6 +3119,10 @@ export default {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   transition: transform 0.2s;
   cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .card-item:hover {
@@ -2381,6 +3141,7 @@ export default {
   font-weight: 300;
   text-align: center;
   margin-top: 6px;
+  font-family: 'SourceHanSerifSC', serif;
 
 }
 
@@ -2391,6 +3152,68 @@ export default {
   text-shadow: 0 0 5px rgba(211, 235, 235, 0.7);
   letter-spacing: 2px;
   margin-left: 28px;
+}
+
+.card-content-wrapper {
+  padding: 5px 10px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.card-data {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.data-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.data-label {
+  color: rgba(193, 255, 255, 0.7);
+  font-size: 11px;
+}
+
+.data-value {
+  color: #C1FFFF;
+  font-weight: bold;
+  text-shadow: 0 0 5px rgba(193, 255, 255, 0.5);
+}
+
+.data-value.highlight {
+  color: #FFD700;
+  text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+}
+
+.data-value.timer {
+  font-family: 'digital', monospace;
+  letter-spacing: 1px;
+}
+
+.status-active {
+  color: #00FF7F;
+  text-shadow: 0 0 5px rgba(0, 255, 127, 0.5);
+}
+
+.progress-bar {
+  height: 4px;
+  width: 50px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  overflow: hidden;
+  margin: 0 5px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00A8FF, #00FFD1);
+  border-radius: 2px;
 }
 
 .weather-info {
@@ -2481,6 +3304,39 @@ export default {
 
 .task-title {
   font-family: 'SourceHanSerifSC', serif;
+}
+
+.map-container {
+  position: relative;
+  padding: 20px;
+  overflow: hidden;
+}
+
+.map-title {
+  position: absolute;
+  top: 5px;
+  left: 10px;
+  color: #C1FFFF;
+  font-size: 14px;
+  font-weight: bold;
+  text-shadow: 0 0 5px rgba(193, 255, 255, 0.5);
+  z-index: 1;
+}
+
+.earth-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.earth-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
 }
 </style>
 

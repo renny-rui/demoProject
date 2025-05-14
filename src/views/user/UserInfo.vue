@@ -96,7 +96,7 @@
     <!-- 用户表单对话框 -->
     <el-dialog ref="dialog" :title="dialogTitle" :visible.sync="dialogVisible" width="500px" @close="resetForm"
       custom-class="user-form-dialog-top" :close-on-click-modal="false" :append-to-body="false" :modal-append-to-body="false" :modal="false">
-      <el-form :model="userForm" :rules="rules" ref="userForm" label-width="100px" class="user-form">
+      <el-form :model="userForm" :rules="rules" ref="userForm" label-width="100px" class="user-form" >
         <el-form-item label="人员ID" prop="Id" v-if="dialogTitle === '编辑人员'">
           <el-input v-model="userForm.Id" placeholder="人员ID" size="medium" disabled></el-input>
         </el-form-item>
@@ -633,7 +633,7 @@ export default {
 }
 
 .user-form-dialog-top .el-dialog__body {
-  background-color: #7B8B9B;
+  background-color: #7B8B9B !important;
   padding: 20px;
 }
 
@@ -1024,6 +1024,10 @@ export default {
 ::v-deep .el-table .el-table__header th {
   background-color: #6C767F !important;
   color: #f0f0f0 !important;
+}
+
+.user-form{
+  margin:28px auto !important;
 }
 </style>
 

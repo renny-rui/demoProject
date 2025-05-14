@@ -118,7 +118,6 @@
                 <span class="team-name">小组{{ index + 1 }}: {{ team.name }}</span>
                 <span class="team-score">
                   评分: 
-                  
                   <el-input-number v-model="team.score" :min="0" :max="100" @change="handleChange" />
                 </span>
               </div>
@@ -202,37 +201,51 @@
 </template>
 
 <script>
-import { getMissionLastList, getMissionMembers, getMissionProcess } from '@/api/mission';
+import { getMissionLastList, getMissionMembers, getMissionProcess, getMissionDetailById, addMissionCommentScore, addMissionTeamCommentScore } from '@/api/mission';
 
 export default {
   name: 'TaskDetail',
   data() {
     return {
-      taskId: null,
+      taskId: '',
+      missionId: '', // 存储MissionLib.MissionId
+      loading: false,
+      membersLoading: false,
+      settlementDialogVisible: false,
       taskData: {
         id: '',
         name: '',
+        terrain: '',
         weather: '',
         time: '',
+        status: 'in-progress',
         participantsCount: 0,
-        status: '',
         createTime: '',
         description: '',
-        mapImage: '',
+        mapImage: null,
         participants: []
       },
-      membersLoading: false,
-      loading: false,
+      // 任务完成结算数据
+      settlementData: {
+        teamCompletion: 85,
+        individualCompletion: 90,
+        accuracy: 95,
+        comments: [
+          { team: '第一小队', comment: '表现优秀，协作能力强' },
+          { team: '第二小队', comment: '完成任务及时，但协作有待提高' }
+        ]
+      },
+      // 任务详情数据
+      missionDetail: null,
+      // 活跃的任务组
+      activeGroups: [],
       participantDialogVisible: false,
       currentParticipant: null,
-      settlementDialogVisible: false,
-      teamEvaluations: [
-        { name: '油料前送组', score: 92, comment: '油料前送组表现出色，在规定时间内完成了所有任务，团队协作良好，油桶平衡度控制得当。' },
-        { name: '热食制作组', score: 88, comment: '热食制作组完成任务过程中展现了良好的协作能力，但在时间控制上还有提升空间。' },
-        { name: '卡勤救护组', score: 95, comment: '卡勤救护组在救护过程中反应迅速，操作规范，担架运送平衡度控制出色，是本次任务中表现最优的小组。' }
-      ],
-      expertComment: '本次任务中，各小组协作良好，在面对复杂地形和恶劣天气的情况下，仍能保持良好的状态完成任务。卡勤救护组表现特别突出，值得表扬。建议热食制作组加强时间管理意识，提高效率。',
-      overallScore: 92
+      teamEvaluations: [],
+      expertComment: '',
+      overallScore: 0,
+      MissionId: null,
+      teamId: null // 添加teamId字段用于存储团队ID
     };
   },
   computed: {
@@ -283,6 +296,8 @@ export default {
               console.log('任务数据',missionData)
               if (missionData.MissionLib) {
                 this.taskData.id = missionData.MissionLib.MissionId || '';
+                localStorage.setItem('MissionId',this.taskData.id)
+                this.missionId = missionData.MissionLib.MissionId || ''; // 存储MissionId用于任务完成结算
                 this.taskData.name = missionData.MissionLib.Name || '';
               }
               
@@ -345,17 +360,13 @@ export default {
  
     // 完成任务
     completeTask() {
-      // this.settlementDialogVisible = true;
-      // 可以在正式实现中取消注释，使用下面的代码
-     
-     
-      
       this.$confirm('确认完成此任务?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        // 调用完成任务API
+        this.settlementDialogVisible=true
+        // 首先调用完成任务API
         const params = {
           MissionId: this.taskData.id,  // 使用任务ID
           Status: 2                    // 状态为2表示任务已完成
@@ -367,10 +378,14 @@ export default {
             if (response && response.success) {
               this.$message.success('任务已完成');
               this.taskData.status = 'completed';
-              // 显示任务完成结算对话框
-              this.showSettlementDialog();
-              // 触发任务完成事件
-              this.$emit('task-completed');
+              
+              // 设置missionId并调用Mission/DetailById获取任务详情数据
+              this.missionId = this.taskData.id;
+              console.log('设置任务ID:', this.missionId);
+              this.fetchMissionDetailById();
+              
+              // 不再触发task-completed事件避免错误
+              // this.$emit('task-completed');
             } else {
               this.$message.error(response?.msg || '完成任务失败');
             }
@@ -382,6 +397,145 @@ export default {
       }).catch(() => {
         this.$message.info('已取消操作');
       });
+    },
+    
+    // 获取任务详情通过ID
+    fetchMissionDetailById() {
+      // 如果没有MissionId，则不调用API
+      if (!this.missionId) {
+        console.error('没有有效的MissionId');
+        return;
+      }
+      
+      // 显示加载状态
+      this.loading = true;
+      
+      // 调用API获取任务详情
+      getMissionDetailById(this.missionId)
+        .then(response => {
+          console.log('任务详情响应:', response);
+          if (response && response.success) {
+            // 存储任务详情数据
+            this.missionDetail = response.data;
+            
+            // 保存TeamId
+            if (response.data.TeamId) {
+              this.teamId = response.data.TeamId;
+            }
+            
+            // 分析活跃的任务组
+            this.analyzeActiveGroups();
+            
+            // 显示任务完成结算对话框
+            this.showSettlementDialog();
+          } else {
+            this.$message.error(response?.msg || '获取任务详情失败');
+          }
+          this.loading = false;
+        })
+        .catch(error => {
+          console.error('获取任务详情失败:', error);
+          this.$message.error('获取任务详情失败');
+          this.loading = false;
+        });
+    },
+    
+    // 分析活跃的任务组
+    analyzeActiveGroups() {
+      if (!this.missionDetail || !this.missionDetail.MissionLib) {
+        return;
+      }
+      
+      // 清空活跃组数组
+      this.activeGroups = [];
+      
+      // 检查每个任务类型是否有成员
+      const taskTypes = [
+        { key: 'HotMealPreparation', name: '热食制作' },
+        { key: 'HotMealDelivery', name: '热食前送' },
+        { key: 'OilDrumDelivery', name: '油料前送' },
+        { key: 'CombatVehicleRefueling', name: '油料加注' },
+        { key: 'CombatVehicleMaintenance', name: '战车抢修' },
+        { key: 'MedicalEvacuation', name: '卫勤救护' }
+      ];
+      
+      // 遍历每个任务类型
+      taskTypes.forEach(taskType => {
+        const task = this.missionDetail.MissionLib[taskType.key];
+        console.log('--1111---',task)
+        
+        // 检查任务是否存在并且有Groups数组
+        if (task && task.Groups && Array.isArray(task.Groups) && task.Groups.length > 0) {
+          // 检查是否有成员
+          let hasMembers = false;
+          task.Groups.forEach(group => {
+            if (group.Members && Array.isArray(group.Members) && group.Members.length > 0) {
+              hasMembers = true;
+            }
+          });
+          
+          // 如果有成员，则添加到活跃组数组
+          if (hasMembers) {
+            this.teamEvaluations.push({
+              key: taskType.key,
+              name: taskType.name,
+              task: task
+            });
+          }
+        }
+      });
+      
+      console.log('活跃的任务组:', this.activeGroups);
+      
+      // 将活跃的任务组赋值给小组评语
+      if (this.teamEvaluations.length > 0) {
+        // 最多取前3个活跃组赋值给小组评语
+        const maxGroups = Math.min(this.teamEvaluations.length, this.teamEvaluations.length);
+        
+        for (let i = 0; i < maxGroups; i++) {
+          // this.teamEvaluations[i].name = this.teamEvaluations[i].name;
+          // 生成默认评语
+          if (!this.teamEvaluations[i].comment) {
+            // this.teamEvaluations[i].comment = `${this.activeGroups[i].name}组在任务中表现良好，完成了指定任务。`;
+          }
+        }
+        
+        // 生成默认的专家评语
+        if (!this.expertComment) {
+          // this.expertComment = `本次任务中，各小组协作良好，${this.activeGroups[0].name}组表现稳定。建议继续加强协作能力训练，提高效率。`;
+        }
+      }
+    },
+    
+    // 计算任务组成员数量
+    countMembers(group) {
+      if (!group || !group.task || !group.task.Groups) {
+        return 0;
+      }
+      
+      let count = 0;
+      group.task.Groups.forEach(teamGroup => {
+        if (teamGroup.Members && Array.isArray(teamGroup.Members)) {
+          count += teamGroup.Members.length;
+        }
+      });
+      
+      return count;
+    },
+    
+    // 格式化角色编号
+    formatRole(roleId) {
+      // 角色映射表
+      const roleMap = {
+        0: '队长',
+        1: '队员',
+        2: '副队长',
+        3: '指挥员',
+        4: '操作员',
+        5: '助手'
+      };
+      
+      return roleMap[roleId] || `角色${roleId}`;
     },
     
     // 显示任务完成结算对话框
@@ -396,9 +550,40 @@ export default {
     
     // 最终完成任务并上传
     finalizeTask() {
-      this.$message.success('任务结算数据已上传');
-      this.settlementDialogVisible = false;
-      // 可以在此处添加其他逻辑，如跳转到任务列表页面
+      this.MissionId = this.taskData.id;
+      
+      // 提交总体评分和专家评语
+      addMissionCommentScore(this.MissionId, this.expertComment, this.overallScore)
+        .then(res => {
+          console.log('总体评分提交结果:', res);
+          
+          // 如果有teamId和小组评分，提交所有小组评分
+          if (this.teamId && this.teamEvaluations.length > 0) {
+            // 创建一个Promise数组，为每个小组评语调用addMissionTeamCommentScore
+            const teamScorePromises = this.teamEvaluations.map(team => {
+              console.log(`提交小组${team.name}评分:`, team.comment, team.score);
+              return addMissionTeamCommentScore(this.teamId, team.comment, team.score)
+                .then(res => {
+                  console.log(`小组${team.name}评分提交结果:`, res);
+                  return res;
+                });
+            });
+            
+            // 返回所有小组评分提交的Promise.all
+            return Promise.all(teamScorePromises);
+          }
+        })
+        .then(results => {
+          if (results) {
+            console.log('所有小组评分提交结果:', results);
+          }
+          this.$message.success('任务结算数据已上传');
+          this.settlementDialogVisible = false;
+        })
+        .catch(error => {
+          console.error('提交评分失败:', error);
+          this.$message.error('提交评分失败');
+        })
     },
     
     // 返回任务列表
@@ -592,6 +777,10 @@ export default {
           console.error('获取任务人员配置请求失败:', error);
           this.membersLoading = false;
         });
+    },
+    handleChange(el){
+      console.log('评语：',el)
+
     }
   }
 };
@@ -885,6 +1074,52 @@ export default {
   background-color: #383D44;
   border-radius: 4px;
   padding: 15px;
+}
+
+/* 活跃任务组样式 */
+.active-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 15px;
+}
+
+.group-card {
+  background-color: #383D44;
+  border: none;
+  margin-bottom: 20px;
+}
+
+.group-card .el-card__header {
+  background-color: #2c3e50;
+  padding: 10px 15px;
+}
+
+.group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.group-name {
+  font-size: 16px;
+  font-weight: bold;
+  color: #C1FFFF;
+}
+
+.team-group {
+  margin-bottom: 15px;
+}
+
+.team-group h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #C1FFFF;
+  font-size: 14px;
+}
+
+.no-groups {
+  margin: 20px 0;
 }
 
 .team-comment-header {
